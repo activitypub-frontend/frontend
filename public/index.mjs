@@ -8,9 +8,9 @@ Vue.component('card', {
 <div class="card-content"><span v-html="card.content"></span></div></div>`
 });
 
-let ttsCardContent = `<div><input type="text" id="wikiSearchInput" placeholder="Artikel laden..."><button v-on:click="getWikipediaData">Suchen</button></div>
+let ttsCardContent = `<div><input type="text" id="wikiSearchInput" placeholder="Artikel laden..."><button id="wikiSearchButton" v-on:click="getWikipediaData">Suchen</button></div>
 <p>{{ wikitext }}</p>
-<button onclick="ReadExtract()">Vorlesen</button>`;
+<button v-on:click="ReadExtract">Vorlesen</button>`;
 
 let cardsVue = new Vue({
 	el: '#content',
@@ -45,6 +45,7 @@ let cardsVue = new Vue({
 	}
 });
 
+// Wiki autocomplete = https://de.wikipedia.org/w/api.php?action=opensearch&search=mariano&namespace=0&format=json
 
 let ttsCardVue = new Vue({
 	el: '#ttsCard',
@@ -55,6 +56,9 @@ let ttsCardVue = new Vue({
 		getWikipediaData: function (event) {
 			getWikipediaSummary(document.getElementById('wikiSearchInput').value);
 
+		},
+		ReadExtract: function (event) {
+			TextToSpeech(this.wikitext);
 		}
 	}
 });
@@ -79,16 +83,16 @@ function TextToSpeech(str) {
 	let url = 'https://stream.watsonplatform.net/text-to-speech/api';
 	let username = '***REMOVED***';
 	let password = '***REMOVED***';
-	fetch(url + '/v1/synthesize', {
+	fetch(url + '/v1/synthesize?voice=de-DE_BirgitVoice', {
 		method: 'POST',
 		cache: 'no-cache',
 		headers: {
 			Authorization: 'Basic ' + btoa(username + ':' + password),
-			Accept: 'audio/mpeg'
+			Accept: 'audio/mpeg',
+			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({
 			text: str,
-			voice: 'de-DE_BirgitVoice',
 			accept: 'audio/mpeg'
 		})
 	})
@@ -111,6 +115,10 @@ function getWikipediaSummary(title) {
 		if ('extract' in json)
 		{
 			ttsCardVue.wikitext = json.extract;
+		}
+		else
+		{
+			ttsCardVue.wikitext = 'Der Eintrag konnte nicht gefunden werden.';
 		}
 	});
 }

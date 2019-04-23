@@ -5,7 +5,7 @@ html {
     background-color: var(--content-background);
 }
 
-::-webkit-scrollbar {
+body::-webkit-scrollbar {
     display: none;
 }
 
@@ -61,4 +61,9 @@ header > p {
     font-size: 16pt;
     font-weight: 700;
     padding-bottom: 5px;
+}
+
+#ttsCard > .card-content {
+    overflow-y: auto;
+    max-height: 83%;
 }
