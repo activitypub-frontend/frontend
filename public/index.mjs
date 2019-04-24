@@ -12,6 +12,8 @@ let ttsCardContent = `<div><input type="text" id="wikiSearchInput" placeholder="
 <p>{{ wikitext }}</p>
 <button v-on:click="ReadExtract">Vorlesen</button>`;
 
+let rssCardContent = '<div v-html="rsscontent"></div>';
+
 let cardsVue = new Vue({
 	el: '#content',
 	data: {
@@ -27,9 +29,9 @@ let cardsVue = new Vue({
 				content: ttsCardContent
 			},
 			{
-				title: 'Card 3',
-				content:
-					'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
+				id: 'rssCard',
+				title: 'RSS Feed from Heise',
+				content: rssCardContent
 			},
 			{
 				title: 'Card 4',
@@ -53,13 +55,21 @@ let ttsCardVue = new Vue({
 		wikitext: 'Dies ist ein Wikitest'
 	},
 	methods: {
-		getWikipediaData: function (event) {
-			getWikipediaSummary(document.getElementById('wikiSearchInput').value);
-
+		getWikipediaData: function(event) {
+			getWikipediaSummary(
+				document.getElementById('wikiSearchInput').value
+			);
 		},
-		ReadExtract: function (event) {
+		ReadExtract: function(event) {
 			TextToSpeech(this.wikitext);
 		}
+	}
+});
+
+let rssCardVue = new Vue({
+	el: '#rssCard',
+	data: {
+		rsscontent: ''
 	}
 });
 
@@ -111,14 +121,51 @@ function TextToSpeech(str) {
 
 function getWikipediaSummary(title) {
 	let url = 'https://de.wikipedia.org/api/rest_v1/page/summary/' + title;
-	fetch(url).then((res) => res.json()).then((json) => {
-		if ('extract' in json)
-		{
-			ttsCardVue.wikitext = json.extract;
-		}
-		else
-		{
-			ttsCardVue.wikitext = 'Der Eintrag konnte nicht gefunden werden.';
-		}
-	});
+	fetch(url)
+		.then(res => res.json())
+		.then(json => {
+			if ('extract' in json) {
+				ttsCardVue.wikitext = json.extract;
+			} else {
+				ttsCardVue.wikitext =
+					'Der Eintrag konnte nicht gefunden werden.';
+			}
+		});
 }
+
+function getRSSFeed()
+{
+	let container = document.createElement('div');
+	container.className = 'rss-container';
+	let url = 'https://www.heise.de/rss/heise.rdf';
+	fetch('/getFile',
+		{ 
+			method: 'POST', 
+			body: JSON.stringify({url: url}), 
+			headers: 
+				{
+					'Content-Type': 'application/json'
+				}
+		})
+		.then((res) => res.text())
+		.then((text) => {
+			let parser = new DOMParser();
+			let doc = parser.parseFromString(text, 'text/xml');
+			Array.from(doc.querySelectorAll('item')).slice(0, 10).forEach((item) => {
+				let article = document.createElement('article');
+				let heading = document.createElement('h1');
+				let heading_link = document.createElement('a');
+				heading_link.href = item.querySelector('guid').textContent;
+				heading_link.textContent = item.querySelector('title').textContent;
+				heading.appendChild(heading_link);
+				article.appendChild(heading);
+				let content = document.createElement('div');
+				content.innerHTML = item.getElementsByTagName('content:encoded')[0].childNodes[0].data;
+				article.appendChild(content);
+				container.appendChild(article);
+				rssCardVue.rsscontent = container.outerHTML;
+			});
+		});
+}
+
+getRSSFeed();
