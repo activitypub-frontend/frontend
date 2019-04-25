@@ -4,13 +4,23 @@ import Vue from './vue.js';
 
 Vue.component('card', {
 	props: ['card'],
-	template: `<div v-bind:id="card.id" class="content-card"><header>{{ card.title }}</header>
-<div class="card-content"><span v-html="card.content"></span></div></div>`
+	template: `<div :id="card.id" class="content-card"><header>{{ card.title }}</header>
+<div class="card-content" v-html="card.content"></div></div>`
 });
 
-let ttsCardContent = `<div><input type="text" id="wikiSearchInput" placeholder="Artikel laden..."><button id="wikiSearchButton" v-on:click="getWikipediaData">Suchen</button></div>
+let weatherCardContent = `<div>
+	<div :class="weatherClass"></div>
+	<p>Aktuelle Temperatur: {{ currentTemp }}</p>
+	<div class="temperatureContainer weatherProgressContainer"><span class="tempMinText weatherBadge">{{ minTemp }}</span><progress :max="tempMaxProgress" :value="tempProgress"></progress><span class="tempMaxText weatherBadge">{{ maxTemp }}</span></div>
+	<p>Luftfeuchtigkeit:</p>
+	<div class="humidityContainer weatherProgressContainer"><progress max="100" :value="humidity"></progress><span><span class="humidityText weatherBadge">{{ humidity }} %</span></div>
+	<p>Wolkendichte</p>
+	<div class="cloudContainer weatherProgressContainer"><progress max="100" :value="clouds"></progress><span><span class="cloudText weatherBadge">{{ clouds }} %</span></div>
+</div>`;
+
+let ttsCardContent = `<div><input @input="getWikiAutocomplete" type="text" id="wikiSearchInput" list="wikiAutocompleteList" placeholder="Artikel laden..."><button type="button" id="wikiSearchButton" @click="getWikipediaData">Suchen</button></div><datalist id="wikiAutocompleteList"></datalist>
 <p>{{ wikitext }}</p>
-<button v-on:click="ReadExtract">Vorlesen</button>`;
+<button type="button" @click="ReadExtract">Vorlesen</button>`;
 
 let rssCardContent = '<div v-html="rsscontent"></div>';
 
@@ -21,7 +31,7 @@ let cardsVue = new Vue({
 			{
 				id: 'weatherCard',
 				title: 'Aktuelles Wetter in Stuttgart',
-				content: ''
+				content: weatherCardContent
 			},
 			{
 				id: 'ttsCard',
@@ -47,8 +57,6 @@ let cardsVue = new Vue({
 	}
 });
 
-// Wiki autocomplete = https://de.wikipedia.org/w/api.php?action=opensearch&search=mariano&namespace=0&format=json
-
 let ttsCardVue = new Vue({
 	el: '#ttsCard',
 	data: {
@@ -56,12 +64,19 @@ let ttsCardVue = new Vue({
 	},
 	methods: {
 		getWikipediaData: function(event) {
-			getWikipediaSummary(
-				document.getElementById('wikiSearchInput').value
-			);
+			let title = document.getElementById('wikiSearchInput').value;
+			if (title !== '') {
+				getWikipediaSummary(title);
+			}
 		},
 		ReadExtract: function(event) {
 			TextToSpeech(this.wikitext);
+		},
+		getWikiAutocomplete: function(event) {
+			let title = document.getElementById('wikiSearchInput').value;
+			if (title !== '') {
+				WikipediaAutocomplete(title);
+			}
 		}
 	}
 });
@@ -73,6 +88,38 @@ let rssCardVue = new Vue({
 	}
 });
 
+let weatherCardVue = new Vue({
+	el: '#weatherCard',
+	data: {
+		temp: 273.15,
+		temp_max: 273.15,
+		temp_min: 273.15,
+		humidity: 50,
+		weathercode: 900,
+		clouds: 50,
+	},
+	computed: {
+		currentTemp: function() {
+			return (this.temp - 273.15).toFixed(1) + '\u00A0°C';
+		},
+		maxTemp: function() {
+			return (this.temp_max - 273.15).toFixed(1) + '\u00A0°C';
+		},
+		minTemp: function() {
+			return (this.temp_min - 273.15).toFixed(1) + '\u00A0°C';
+		},
+		tempProgress: function() {
+			return (this.temp - this.temp_min) / this.temp_min;
+		},
+		tempMaxProgress: function () {
+			return (this.temp_max - this.temp_min) / this.temp_min;
+		},
+		weatherClass: function() {
+			return 'wi wi-owm-' + this.weathercode;
+		}
+	}
+});
+
 function getOWMData() {
 	fetch(
 		'https://api.openweathermap.org/data/2.5/weather?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
@@ -81,9 +128,13 @@ function getOWMData() {
 			return res.json();
 		})
 		.then(json => {
-			cardsVue.cards[0].content = `Aktuelle Temperatur: ${(
-				json.main.temp - 273.15
-			).toFixed(1)} °C`;
+			console.log(json);
+			weatherCardVue.temp = json.main.temp;
+			weatherCardVue.temp_max = json.main.temp_max;
+			weatherCardVue.temp_min = json.main.temp_min;
+			weatherCardVue.humidity = json.main.humidity;
+			weatherCardVue.weathercode = json.weather[0].id;
+			weatherCardVue.clouds = json.clouds.all;
 		});
 }
 
@@ -113,7 +164,7 @@ function TextToSpeech(str) {
 			const reader = new FileReader();
 			reader.readAsDataURL(blob);
 			reader.onloadend = () => {
-				let audio = new Audio(reader.result);
+				const audio = new Audio(reader.result);
 				audio.play();
 			};
 		});
@@ -122,50 +173,77 @@ function TextToSpeech(str) {
 function getWikipediaSummary(title) {
 	let url = 'https://de.wikipedia.org/api/rest_v1/page/summary/' + title;
 	fetch(url)
-		.then(res => res.json())
+		.then(res => {ttsCardVue.wikidata = 'Artikel wird geladen...'; return res.json();})
 		.then(json => {
 			if ('extract' in json) {
 				ttsCardVue.wikitext = json.extract;
 			} else {
 				ttsCardVue.wikitext =
-					'Der Eintrag konnte nicht gefunden werden.';
+					'Der Artikel konnte nicht gefunden werden.';
 			}
 		});
 }
 
-function getRSSFeed()
-{
+function getRSSFeed() {
 	let container = document.createElement('div');
 	container.className = 'rss-container';
 	let url = 'https://www.heise.de/rss/heise.rdf';
-	fetch('/getFile',
-		{ 
-			method: 'POST', 
-			body: JSON.stringify({url: url}), 
-			headers: 
-				{
-					'Content-Type': 'application/json'
-				}
-		})
-		.then((res) => res.text())
-		.then((text) => {
+	fetch('/getFile', {
+		method: 'POST',
+		body: JSON.stringify({ url: url }),
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	})
+		.then(res => res.text())
+		.then(text => {
 			let parser = new DOMParser();
 			let doc = parser.parseFromString(text, 'text/xml');
-			Array.from(doc.querySelectorAll('item')).slice(0, 10).forEach((item) => {
-				let article = document.createElement('article');
-				let heading = document.createElement('h1');
-				let heading_link = document.createElement('a');
-				heading_link.href = item.querySelector('guid').textContent;
-				heading_link.textContent = item.querySelector('title').textContent;
-				heading.appendChild(heading_link);
-				article.appendChild(heading);
-				let content = document.createElement('div');
-				content.innerHTML = item.getElementsByTagName('content:encoded')[0].childNodes[0].data;
-				article.appendChild(content);
-				container.appendChild(article);
-				rssCardVue.rsscontent = container.outerHTML;
-			});
+			Array.from(doc.querySelectorAll('item'))
+				.slice(0, 10)
+				.forEach(item => {
+					let article = document.createElement('article');
+					let heading = document.createElement('h1');
+					let heading_link = document.createElement('a');
+					heading_link.href = item.querySelector('guid').textContent;
+					heading_link.textContent = item.querySelector(
+						'title'
+					).textContent;
+					heading.appendChild(heading_link);
+					article.appendChild(heading);
+					let published = document.createElement('div');
+					published.textContent = 'Erschienen ' + (new Date(Date.parse(item.querySelector('pubDate').innerHTML))).toLocaleString('de-DE');
+					article.appendChild(published);
+					let content = document.createElement('div');
+					content.innerHTML = item.getElementsByTagName(
+						'content:encoded'
+					)[0].childNodes[0].data;
+					article.appendChild(content);
+					container.appendChild(article);
+					rssCardVue.rsscontent = container.outerHTML;
+				});
 		});
 }
 
 getRSSFeed();
+
+
+function WikipediaAutocomplete(title)
+{
+	let url = 'https://de.wikipedia.org/w/api.php?action=opensearch&namespace=0&format=json&search=' + encodeURIComponent(title);
+	fetch('/getFile', {
+		method: 'POST',
+		body: JSON.stringify({ url: url }),
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	}).then((res) => res.json()).then((json) => {
+		let datalist = document.getElementById('wikiAutocompleteList');
+		datalist.innerHTML = '';
+		json[1].forEach((item) => {
+			let option = document.createElement('option');
+			option.value = item;
+			datalist.appendChild(option);
+		});
+	});
+}

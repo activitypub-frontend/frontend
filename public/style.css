@@ -1,7 +1,11 @@
+@import "weatherCard.css";
+
 html {
     --text-color: white;
     --header-background: #FF6F61;
     --content-background: #eeeeee;
+    --min-temperature-color: #aaaaff;
+    --max-temperature-color: #ff8888;
     background-color: var(--content-background);
 }
 
@@ -28,6 +32,16 @@ header > p {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 18pt;
     transform: translateY(-15%);
+}
+
+@media only screen and (max-width: 800px) {
+    .content-card {
+        max-width: 100% !important;
+    }
+
+    #content {
+        flex-flow: column nowrap !important;
+    }
 }
 
 #content {
@@ -68,4 +82,41 @@ header > p {
     overflow-y: auto;
     overflow-x: hidden;
     max-height: 83%;
+}
+
+#rssCard {
+    display: flex;
+    flex-flow: column;
+}
+
+#rssCard article {
+    border-bottom: #223344 solid 1px;
+    background-color: #eef;
+    border-radius: 4px;
+    padding-left: 3px;
+    width: 95%;
+}
+
+#rssCard img {
+    width: 95%;
+    border-radius: 3px;
+}
+
+#rssCard h1 a {
+    font-size: 14pt;
+    color: #223344;
+}
+
+button {
+    background: var(--header-background);
+    border-radius: 5px;
+    border: none;
+    padding: 5px;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+input[type="text"] {
+    margin-right: 5px;
+    padding: 2px;
 }
