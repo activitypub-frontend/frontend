@@ -5,7 +5,7 @@ import Vue from './vue.js';
 Vue.component('card', {
 	props: ['card'],
 	template: `<div :id="card.id" class="content-card"><header>{{ card.title }}</header>
-<div class="card-content" v-html="card.content"></div></div>`
+<div class="card-content" :id="card.id + '-content'" v-html="card.content"></div></div>`
 });
 
 let weatherCardContent = `<div>
@@ -30,7 +30,7 @@ let cardsVue = new Vue({
 		cards: [
 			{
 				id: 'weatherCard',
-				title: 'Aktuelles Wetter in Stuttgart',
+				title: 'Current weather in Stuttgart',
 				content: weatherCardContent
 			},
 			{
@@ -60,19 +60,19 @@ let cardsVue = new Vue({
 let ttsCardVue = new Vue({
 	el: '#ttsCard',
 	data: {
-		wikitext: 'Dies ist ein Wikitest'
+		wikitext: 'Suchen Sie nach einem Begriff, um die Daten hier anzeigen zu lassen.'
 	},
 	methods: {
-		getWikipediaData: function(event) {
+		getWikipediaData: function () {
 			let title = document.getElementById('wikiSearchInput').value;
 			if (title !== '') {
 				getWikipediaSummary(title);
 			}
 		},
-		ReadExtract: function(event) {
+		ReadExtract: function () {
 			TextToSpeech(this.wikitext);
 		},
-		getWikiAutocomplete: function(event) {
+		getWikiAutocomplete: function () {
 			let title = document.getElementById('wikiSearchInput').value;
 			if (title !== '') {
 				WikipediaAutocomplete(title);
@@ -89,7 +89,7 @@ let rssCardVue = new Vue({
 });
 
 let weatherCardVue = new Vue({
-	el: '#weatherCard',
+	el: '#weatherCard-content',
 	data: {
 		temp: 273.15,
 		temp_max: 273.15,
@@ -99,89 +99,82 @@ let weatherCardVue = new Vue({
 		clouds: 50,
 	},
 	computed: {
-		currentTemp: function() {
+		currentTemp: function () {
 			return (this.temp - 273.15).toFixed(1) + '\u00A0°C';
 		},
-		maxTemp: function() {
+		maxTemp: function () {
 			return (this.temp_max - 273.15).toFixed(1) + '\u00A0°C';
 		},
-		minTemp: function() {
+		minTemp: function () {
 			return (this.temp_min - 273.15).toFixed(1) + '\u00A0°C';
 		},
-		tempProgress: function() {
+		tempProgress: function () {
 			return (this.temp - this.temp_min) / this.temp_min;
 		},
 		tempMaxProgress: function () {
 			return (this.temp_max - this.temp_min) / this.temp_min;
 		},
-		weatherClass: function() {
+		weatherClass: function () {
 			return 'wi wi-owm-' + this.weathercode;
 		}
 	}
 });
 
 function getOWMData() {
-	fetch(
-		'https://api.openweathermap.org/data/2.5/weather?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
-	)
-		.then(res => {
-			return res.json();
-		})
-		.then(json => {
-			console.log(json);
-			weatherCardVue.temp = json.main.temp;
-			weatherCardVue.temp_max = json.main.temp_max;
-			weatherCardVue.temp_min = json.main.temp_min;
-			weatherCardVue.humidity = json.main.humidity;
-			weatherCardVue.weathercode = json.weather[0].id;
-			weatherCardVue.clouds = json.clouds.all;
-		});
+	navigator.geolocation.getCurrentPosition((data) => {
+		fetch('https://api.openweathermap.org/data/2.5/weather?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' + data.coords.longitude + '&lat=' + data.coords.latitude)
+			.then(res => {
+				return res.json();
+			})
+			.then(json => {
+				cardsVue.cards.filter(item => item.id === 'weatherCard')[0].title = 'Current weather in ' + json.name;
+				weatherCardVue.temp = json.main.temp;
+				weatherCardVue.temp_max = json.main.temp_max;
+				weatherCardVue.temp_min = json.main.temp_min;
+				weatherCardVue.humidity = json.main.humidity;
+				weatherCardVue.weathercode = json.weather[0].id;
+				weatherCardVue.clouds = json.clouds.all;
+			});
+	}, () => {
+		fetch(
+			'https://api.openweathermap.org/data/2.5/weather?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
+		)
+			.then(res => {
+				return res.json();
+			})
+			.then(json => {
+				weatherCardVue.temp = json.main.temp;
+				weatherCardVue.temp_max = json.main.temp_max;
+				weatherCardVue.temp_min = json.main.temp_min;
+				weatherCardVue.humidity = json.main.humidity;
+				weatherCardVue.weathercode = json.weather[0].id;
+				weatherCardVue.clouds = json.clouds.all;
+			});
+	});
 }
 
 getOWMData();
 
 function TextToSpeech(str) {
-	let url = 'https://stream.watsonplatform.net/text-to-speech/api';
-	let username = '***REMOVED***';
-	let password = '***REMOVED***';
-	fetch(url + '/v1/synthesize?voice=de-DE_BirgitVoice', {
+	fetch('/getTTS', {
 		method: 'POST',
-		cache: 'no-cache',
+		body: JSON.stringify({ text: str }),
 		headers: {
-			Authorization: 'Basic ' + btoa(username + ':' + password),
-			Accept: 'audio/mpeg',
 			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			text: str,
-			accept: 'audio/mpeg'
-		})
+		}
 	})
-		.then(res => {
-			return res.blob();
-		})
+		.then(res => res.blob())
 		.then(blob => {
 			const reader = new FileReader();
 			reader.readAsDataURL(blob);
-			reader.onloadend = () => {
-				const audio = new Audio(reader.result);
-				audio.play();
-			};
+			reader.onloadend = () => (new Audio(reader.result)).play();
 		});
 }
 
 function getWikipediaSummary(title) {
-	let url = 'https://de.wikipedia.org/api/rest_v1/page/summary/' + title;
-	fetch(url)
-		.then(res => {ttsCardVue.wikidata = 'Artikel wird geladen...'; return res.json();})
-		.then(json => {
-			if ('extract' in json) {
-				ttsCardVue.wikitext = json.extract;
-			} else {
-				ttsCardVue.wikitext =
-					'Der Artikel konnte nicht gefunden werden.';
-			}
-		});
+	fetch('https://de.wikipedia.org/api/rest_v1/page/summary/' + title)
+		.then(res => { ttsCardVue.wikidata = 'Artikel wird geladen...'; return res.json(); })
+		.then(json => ttsCardVue.wikitext = ('extract' in json) ? json.extract : 'Der Artikel konnte nicht gefunden werden.');
 }
 
 function getRSSFeed() {
@@ -228,8 +221,7 @@ function getRSSFeed() {
 getRSSFeed();
 
 
-function WikipediaAutocomplete(title)
-{
+function WikipediaAutocomplete(title) {
 	let url = 'https://de.wikipedia.org/w/api.php?action=opensearch&namespace=0&format=json&search=' + encodeURIComponent(title);
 	fetch('/getFile', {
 		method: 'POST',
