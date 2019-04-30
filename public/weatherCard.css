@@ -50,7 +50,7 @@ html {
 }
 
 .cloudContainer progress[value]::-webkit-progress-value {
-    background-image: -webkit-linear-gradient(left, #ffffff, #aaaaaa);
+    background-image: -webkit-linear-gradient(left, #eeeeee, #999999);
 }
 
 .tempMinText {

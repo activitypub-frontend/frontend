@@ -60,19 +60,20 @@ let cardsVue = new Vue({
 let ttsCardVue = new Vue({
 	el: '#ttsCard',
 	data: {
-		wikitext: 'Suchen Sie nach einem Begriff, um die Daten hier anzeigen zu lassen.'
+		wikitext:
+			'Suchen Sie nach einem Begriff, um die Daten hier anzeigen zu lassen.'
 	},
 	methods: {
-		getWikipediaData: function () {
+		getWikipediaData: function() {
 			let title = document.getElementById('wikiSearchInput').value;
 			if (title !== '') {
 				getWikipediaSummary(title);
 			}
 		},
-		ReadExtract: function () {
+		ReadExtract: function() {
 			TextToSpeech(this.wikitext);
 		},
-		getWikiAutocomplete: function () {
+		getWikiAutocomplete: function() {
 			let title = document.getElementById('wikiSearchInput').value;
 			if (title !== '') {
 				WikipediaAutocomplete(title);
@@ -96,61 +97,71 @@ let weatherCardVue = new Vue({
 		temp_min: 273.15,
 		humidity: 50,
 		weathercode: 900,
-		clouds: 50,
+		clouds: 50
 	},
 	computed: {
-		currentTemp: function () {
+		currentTemp: function() {
 			return (this.temp - 273.15).toFixed(1) + '\u00A0°C';
 		},
-		maxTemp: function () {
+		maxTemp: function() {
 			return (this.temp_max - 273.15).toFixed(1) + '\u00A0°C';
 		},
-		minTemp: function () {
+		minTemp: function() {
 			return (this.temp_min - 273.15).toFixed(1) + '\u00A0°C';
 		},
-		tempProgress: function () {
+		tempProgress: function() {
 			return (this.temp - this.temp_min) / this.temp_min;
 		},
-		tempMaxProgress: function () {
+		tempMaxProgress: function() {
 			return (this.temp_max - this.temp_min) / this.temp_min;
 		},
-		weatherClass: function () {
+		weatherClass: function() {
 			return 'wi wi-owm-' + this.weathercode;
 		}
 	}
 });
 
 function getOWMData() {
-	navigator.geolocation.getCurrentPosition((data) => {
-		fetch('https://api.openweathermap.org/data/2.5/weather?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' + data.coords.longitude + '&lat=' + data.coords.latitude)
-			.then(res => {
-				return res.json();
-			})
-			.then(json => {
-				cardsVue.cards.filter(item => item.id === 'weatherCard')[0].title = 'Current weather in ' + json.name;
-				weatherCardVue.temp = json.main.temp;
-				weatherCardVue.temp_max = json.main.temp_max;
-				weatherCardVue.temp_min = json.main.temp_min;
-				weatherCardVue.humidity = json.main.humidity;
-				weatherCardVue.weathercode = json.weather[0].id;
-				weatherCardVue.clouds = json.clouds.all;
-			});
-	}, () => {
-		fetch(
-			'https://api.openweathermap.org/data/2.5/weather?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
-		)
-			.then(res => {
-				return res.json();
-			})
-			.then(json => {
-				weatherCardVue.temp = json.main.temp;
-				weatherCardVue.temp_max = json.main.temp_max;
-				weatherCardVue.temp_min = json.main.temp_min;
-				weatherCardVue.humidity = json.main.humidity;
-				weatherCardVue.weathercode = json.weather[0].id;
-				weatherCardVue.clouds = json.clouds.all;
-			});
-	});
+	navigator.geolocation.getCurrentPosition(
+		data => {
+			fetch(
+				'https://api.openweathermap.org/data/2.5/weather?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' +
+					data.coords.longitude +
+					'&lat=' +
+					data.coords.latitude
+			)
+				.then(res => {
+					return res.json();
+				})
+				.then(json => {
+					cardsVue.cards.filter(
+						item => item.id === 'weatherCard'
+					)[0].title = 'Current weather in ' + json.name;
+					weatherCardVue.temp = json.main.temp;
+					weatherCardVue.temp_max = json.main.temp_max;
+					weatherCardVue.temp_min = json.main.temp_min;
+					weatherCardVue.humidity = json.main.humidity;
+					weatherCardVue.weathercode = json.weather[0].id;
+					weatherCardVue.clouds = json.clouds.all;
+				});
+		},
+		() => {
+			fetch(
+				'https://api.openweathermap.org/data/2.5/weather?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
+			)
+				.then(res => {
+					return res.json();
+				})
+				.then(json => {
+					weatherCardVue.temp = json.main.temp;
+					weatherCardVue.temp_max = json.main.temp_max;
+					weatherCardVue.temp_min = json.main.temp_min;
+					weatherCardVue.humidity = json.main.humidity;
+					weatherCardVue.weathercode = json.weather[0].id;
+					weatherCardVue.clouds = json.clouds.all;
+				});
+		}
+	);
 }
 
 getOWMData();
@@ -167,14 +178,22 @@ function TextToSpeech(str) {
 		.then(blob => {
 			const reader = new FileReader();
 			reader.readAsDataURL(blob);
-			reader.onloadend = () => (new Audio(reader.result)).play();
+			reader.onloadend = () => new Audio(reader.result).play();
 		});
 }
 
 function getWikipediaSummary(title) {
 	fetch('https://de.wikipedia.org/api/rest_v1/page/summary/' + title)
-		.then(res => { ttsCardVue.wikidata = 'Artikel wird geladen...'; return res.json(); })
-		.then(json => ttsCardVue.wikitext = ('extract' in json) ? json.extract : 'Der Artikel konnte nicht gefunden werden.');
+		.then(res => {
+			ttsCardVue.wikidata = 'Artikel wird geladen...';
+			return res.json();
+		})
+		.then(
+			json =>
+				(ttsCardVue.wikitext =
+					'extract' in json ? json.extract
+						: 'Der Artikel konnte nicht gefunden werden.')
+		);
 }
 
 function getRSSFeed() {
@@ -198,6 +217,8 @@ function getRSSFeed() {
 					let article = document.createElement('article');
 					let heading = document.createElement('h1');
 					let heading_link = document.createElement('a');
+					heading_link.rel = 'noreferrer';
+					heading_link.target = '_blank';
 					heading_link.href = item.querySelector('guid').textContent;
 					heading_link.textContent = item.querySelector(
 						'title'
@@ -205,7 +226,11 @@ function getRSSFeed() {
 					heading.appendChild(heading_link);
 					article.appendChild(heading);
 					let published = document.createElement('div');
-					published.textContent = 'Erschienen ' + (new Date(Date.parse(item.querySelector('pubDate').innerHTML))).toLocaleString('de-DE');
+					published.textContent =
+						'Erschienen ' +
+						new Date(
+							Date.parse(item.querySelector('pubDate').innerHTML)
+						).toLocaleString('de-DE');
 					article.appendChild(published);
 					let content = document.createElement('div');
 					content.innerHTML = item.getElementsByTagName(
@@ -220,22 +245,25 @@ function getRSSFeed() {
 
 getRSSFeed();
 
-
 function WikipediaAutocomplete(title) {
-	let url = 'https://de.wikipedia.org/w/api.php?action=opensearch&namespace=0&format=json&search=' + encodeURIComponent(title);
+	let url =
+		'https://de.wikipedia.org/w/api.php?action=opensearch&namespace=0&format=json&search=' +
+		encodeURIComponent(title);
 	fetch('/getFile', {
 		method: 'POST',
 		body: JSON.stringify({ url: url }),
 		headers: {
 			'Content-Type': 'application/json'
 		}
-	}).then((res) => res.json()).then((json) => {
-		let datalist = document.getElementById('wikiAutocompleteList');
-		datalist.innerHTML = '';
-		json[1].forEach((item) => {
-			let option = document.createElement('option');
-			option.value = item;
-			datalist.appendChild(option);
+	})
+		.then(res => res.json())
+		.then(json => {
+			let datalist = document.getElementById('wikiAutocompleteList');
+			datalist.innerHTML = '';
+			json[1].forEach(item => {
+				let option = document.createElement('option');
+				option.value = item;
+				datalist.appendChild(option);
+			});
 		});
-	});
 }
