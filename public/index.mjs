@@ -360,3 +360,9 @@ function GetOWMForecast() {
 }
 
 GetOWMForecast();
+
+document.querySelector('.lightdarkswitch').onclick = () => {
+	document.querySelector('html').classList.toggle('dark');
+	document.querySelector('.lightdarkswitch').classList.toggle('wi-day-sunny');
+	document.querySelector('.lightdarkswitch').classList.toggle('wi-night-clear');
+};

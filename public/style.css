@@ -7,9 +7,18 @@ html {
     --selection: #008;
     --content-background: #eeeeee;
     --card-background: #ffffff;
+    --content-text-color: #000;
     --min-temperature-color: #aaaaff;
     --max-temperature-color: #ffaaaa;
+    --shadow-color: rgba(0,0,0,0.3);
     background-color: var(--content-background);
+}
+
+html.dark {
+    --content-background: #666666;
+    --card-background: #323232;
+    --content-text-color: #fff;
+    --shadow-color: rgba(255, 255, 255, 0.3);
 }
 
 body::-webkit-scrollbar {
@@ -31,15 +40,16 @@ body > header {
     height: 75px;
     color: var(--header-text-color);
     z-index: 10000;
-    box-shadow: 0 5px 4px 0 rgba(100, 100, 100, 0.5);
+    box-shadow: 0 5px 4px 0 var(--shadow-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 header > p {
     margin-left: 20px;
-    top: 50%;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 18pt;
-    transform: translateY(-15%);
 }
 
 @media only screen and (max-width: 800px) {
@@ -61,6 +71,7 @@ header > p {
     flex-flow: row wrap;
     justify-content: left;
     overflow: auto;
+    color: var(--content-text-color);
 }
 
 .content-card {
@@ -76,7 +87,7 @@ header > p {
     background-color: var(--card-background);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow: hidden;
-    box-shadow: 5px 5px 3px 0 rgba(100, 100, 100, 0.5);
+    box-shadow: 5px 5px 3px 0 var(--shadow-color);
 }
 
 .content-card:hover {
@@ -109,7 +120,7 @@ header > p {
 
 #rssCard article {
     border-bottom: #223344 solid 1px;
-    background-color: #eef;
+    background-color: var(--content-background);
     border-radius: 4px;
     padding-left: 7px;
     width: 95%;
@@ -122,7 +133,7 @@ header > p {
 
 #rssCard h1 a {
     font-size: 14pt;
-    color: #223344;
+    color: var(--content-text-color);
 }
 
 button {
@@ -132,7 +143,7 @@ button {
     padding: 5px;
     color: var(--header-text-color);
     cursor: pointer;
-    box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.25);
+    box-shadow: 2px 2px 2px 0 var(--shadow-color);
     margin-bottom: 2px;
 }
 
@@ -150,4 +161,11 @@ canvas {
     max-width: 100%;
     width: 100% !important;
     height: 100% !important;
+}
+
+.lightdarkswitch
+{
+    font-size: 28pt;
+    color: var(--header-text-color);
+    margin-right: 20px;
 }
