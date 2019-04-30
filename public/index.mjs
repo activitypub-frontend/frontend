@@ -9,19 +9,52 @@ Vue.component('card', {
 <div class="card-content" :id="card.id + '-content'" v-html="card.content"></div></div>`
 });
 
+function ColorMix(c1, c2, mix)
+{
+	let result = [0, 0, 0];
+
+	result[0] = c1[0]*(1-mix) + c2[0]*(mix);
+	result[1] = c1[1]*(1-mix) + c2[1]*(mix);
+	result[2] = c1[2]*(1-mix) + c2[2]*(mix);
+	return result;
+}
+
+function rgbToHex(rgb) { 
+	let hex = Number(Number(rgb).toFixed(0)).toString(16);
+	if (hex.length < 2) {
+		hex = '0' + hex;
+	}
+	return hex;
+}
+
+function parseWeatherData(json)
+{
+	cardsVue.cards.filter(
+		item => item.id === 'weatherCard'
+	)[0].title = 'Current weather in ' + json.name;
+	weatherCardVue.temp = json.main.temp;
+	weatherCardVue.temp_max = json.main.temp_max;
+	weatherCardVue.temp_min = json.main.temp_min;
+	weatherCardVue.humidity = json.main.humidity;
+	weatherCardVue.weathercode = json.weather[0].id;
+	weatherCardVue.clouds = json.clouds.all;
+	let color = ColorMix([255, 170, 170], [170, 170, 255], ((json.main.temp - 273.15) - (json.main.temp_min - 273.15)) / (json.main.temp_min - 273.15));
+	document.documentElement.style.setProperty('--current-temp-color', '#'+rgbToHex(color[0])+rgbToHex(color[1])+rgbToHex(color[2]));
+}
+
 let weatherCardContent = `<div>
 	<div :class="weatherClass"></div>
-	<p>Aktuelle Temperatur: {{ currentTemp }}</p>
+	<p>Current temperature: <span class="currentTempText weatherBadge">{{ currentTemp }}</span></p>
 	<div class="temperatureContainer weatherProgressContainer"><span class="tempMinText weatherBadge">{{ minTemp }}</span><progress :max="tempMaxProgress" :value="tempProgress"></progress><span class="tempMaxText weatherBadge">{{ maxTemp }}</span></div>
-	<p>Luftfeuchtigkeit:</p>
+	<p>Humidity:</p>
 	<div class="humidityContainer weatherProgressContainer"><progress max="100" :value="humidity"></progress><span><span class="humidityText weatherBadge">{{ humidity }} %</span></div>
-	<p>Wolkendichte</p>
+	<p>Cloud density:</p>
 	<div class="cloudContainer weatherProgressContainer"><progress max="100" :value="clouds"></progress><span><span class="cloudText weatherBadge">{{ clouds }} %</span></div>
 </div>`;
 
-let ttsCardContent = `<div><input @input="getWikiAutocomplete" type="text" id="wikiSearchInput" list="wikiAutocompleteList" placeholder="Artikel laden..."><button type="button" id="wikiSearchButton" @click="getWikipediaData">Suchen</button></div><datalist id="wikiAutocompleteList"></datalist>
+let ttsCardContent = `<div><input @input="getWikiAutocomplete" type="text" id="wikiSearchInput" list="wikiAutocompleteList" placeholder="Load article..."><button type="button" id="wikiSearchButton" @click="getWikipediaData">Search</button></div><datalist id="wikiAutocompleteList"></datalist>
 <p>{{ wikitext }}</p>
-<button type="button" @click="ReadExtract">Vorlesen</button>`;
+<button type="button" @click="ReadExtract">Read aloud</button>`;
 
 let weatherForecastCardContent =
 	'<canvas id="weatherForecastChart" width="350" height="320"></canvas>';
@@ -114,10 +147,10 @@ let weatherCardVue = new Vue({
 			return (this.temp_min - 273.15).toFixed(1) + '\u00A0°C';
 		},
 		tempProgress: function() {
-			return (this.temp - this.temp_min) / this.temp_min;
+			return ((this.temp - 273.15) - (this.temp_min - 273.15)) / (this.temp_min - 273.15);
 		},
 		tempMaxProgress: function() {
-			return (this.temp_max - this.temp_min) / this.temp_min;
+			return ((this.temp_max - 273.15) - (this.temp_min - 273.15)) / (this.temp_min - 273.15);
 		},
 		weatherClass: function() {
 			return 'wi wi-owm-' + this.weathercode;
@@ -138,15 +171,7 @@ function getOWMData() {
 					return res.json();
 				})
 				.then(json => {
-					cardsVue.cards.filter(
-						item => item.id === 'weatherCard'
-					)[0].title = 'Current weather in ' + json.name;
-					weatherCardVue.temp = json.main.temp;
-					weatherCardVue.temp_max = json.main.temp_max;
-					weatherCardVue.temp_min = json.main.temp_min;
-					weatherCardVue.humidity = json.main.humidity;
-					weatherCardVue.weathercode = json.weather[0].id;
-					weatherCardVue.clouds = json.clouds.all;
+					parseWeatherData(json);
 				});
 		},
 		() => {
@@ -157,12 +182,7 @@ function getOWMData() {
 					return res.json();
 				})
 				.then(json => {
-					weatherCardVue.temp = json.main.temp;
-					weatherCardVue.temp_max = json.main.temp_max;
-					weatherCardVue.temp_min = json.main.temp_min;
-					weatherCardVue.humidity = json.main.humidity;
-					weatherCardVue.weathercode = json.weather[0].id;
-					weatherCardVue.clouds = json.clouds.all;
+					parseWeatherData(json);
 				});
 		}
 	);
