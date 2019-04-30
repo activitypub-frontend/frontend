@@ -1,5 +1,3 @@
-// import Vue from 'https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.esm.browser.js';
-//import Vue from 'vue';
 import Vue from './vue.js';
 import Chart from './Chart.js';
 
@@ -9,37 +7,36 @@ Vue.component('card', {
 <div class="card-content" :id="card.id + '-content'" v-html="card.content"></div></div>`
 });
 
-function ColorMix(c1, c2, mix)
-{
-	let result = [0, 0, 0];
+const ColorMix = (c1, c2, mix) => [
+	c1[0] * (1 - mix) + c2[0] * mix,
+	c1[1] * (1 - mix) + c2[1] * mix,
+	c1[2] * (1 - mix) + c2[2] * mix
+];
 
-	result[0] = c1[0]*(1-mix) + c2[0]*(mix);
-	result[1] = c1[1]*(1-mix) + c2[1]*(mix);
-	result[2] = c1[2]*(1-mix) + c2[2]*(mix);
-	return result;
-}
-
-function rgbToHex(rgb) { 
+function rgbToHex(rgb) {
 	let hex = Number(Number(rgb).toFixed(0)).toString(16);
-	if (hex.length < 2) {
-		hex = '0' + hex;
-	}
-	return hex;
+	return hex.length < 2 ? '0' + hex : hex;
 }
 
-function parseWeatherData(json)
-{
-	cardsVue.cards.filter(
-		item => item.id === 'weatherCard'
-	)[0].title = 'Current weather in ' + json.name;
+function parseWeatherData(json) {
+	cardsVue.cards.filter(item => item.id === 'weatherCard')[0].title =
+		'Current weather in ' + json.name;
 	weatherCardVue.temp = json.main.temp;
 	weatherCardVue.temp_max = json.main.temp_max;
 	weatherCardVue.temp_min = json.main.temp_min;
 	weatherCardVue.humidity = json.main.humidity;
 	weatherCardVue.weathercode = json.weather[0].id;
 	weatherCardVue.clouds = json.clouds.all;
-	let color = ColorMix([255, 170, 170], [170, 170, 255], ((json.main.temp - 273.15) - (json.main.temp_min - 273.15)) / (json.main.temp_min - 273.15));
-	document.documentElement.style.setProperty('--current-temp-color', '#'+rgbToHex(color[0])+rgbToHex(color[1])+rgbToHex(color[2]));
+	let color = ColorMix(
+		[255, 170, 170],
+		[170, 170, 255],
+		(json.main.temp - 273.15 - (json.main.temp_min - 273.15)) /
+			(json.main.temp_min - 273.15)
+	);
+	document.documentElement.style.setProperty(
+		'--current-temp-color',
+		'#' + rgbToHex(color[0]) + rgbToHex(color[1]) + rgbToHex(color[2])
+	);
 }
 
 let weatherCardContent = `<div>
@@ -97,8 +94,7 @@ let cardsVue = new Vue({
 let ttsCardVue = new Vue({
 	el: '#ttsCard',
 	data: {
-		wikitext:
-			'Suchen Sie nach einem Begriff, um die Daten hier anzeigen zu lassen.'
+		wikitext: 'Use the search to view any article.'
 	},
 	methods: {
 		getWikipediaData: function() {
@@ -147,10 +143,16 @@ let weatherCardVue = new Vue({
 			return (this.temp_min - 273.15).toFixed(1) + '\u00A0°C';
 		},
 		tempProgress: function() {
-			return ((this.temp - 273.15) - (this.temp_min - 273.15)) / (this.temp_min - 273.15);
+			return (
+				(this.temp - 273.15 - (this.temp_min - 273.15)) /
+				(this.temp_min - 273.15)
+			);
 		},
 		tempMaxProgress: function() {
-			return ((this.temp_max - 273.15) - (this.temp_min - 273.15)) / (this.temp_min - 273.15);
+			return (
+				(this.temp_max - 273.15 - (this.temp_min - 273.15)) /
+				(this.temp_min - 273.15)
+			);
 		},
 		weatherClass: function() {
 			return 'wi wi-owm-' + this.weathercode;
@@ -159,37 +161,31 @@ let weatherCardVue = new Vue({
 });
 
 function getOWMData() {
-	navigator.geolocation.getCurrentPosition(
-		data => {
-			fetch(
-				'https://api.openweathermap.org/data/2.5/weather?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' +
-					data.coords.longitude +
-					'&lat=' +
-					data.coords.latitude
-			)
-				.then(res => {
-					return res.json();
-				})
-				.then(json => {
-					parseWeatherData(json);
-				});
-		},
-		() => {
-			fetch(
-				'https://api.openweathermap.org/data/2.5/weather?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
-			)
-				.then(res => {
-					return res.json();
-				})
-				.then(json => {
-					parseWeatherData(json);
-				});
-		}
-	);
+	fetch(
+		'https://api.openweathermap.org/data/2.5/weather?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
+	)
+		.then(res => {
+			return res.json();
+		})
+		.then(json => {
+			parseWeatherData(json);
+		});
+	navigator.geolocation.getCurrentPosition(data => {
+		fetch(
+			'https://api.openweathermap.org/data/2.5/weather?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' +
+				data.coords.longitude +
+				'&lat=' +
+				data.coords.latitude
+		)
+			.then(res => {
+				return res.json();
+			})
+			.then(json => {
+				parseWeatherData(json);
+			});
+	});
 }
-
 getOWMData();
-
 function TextToSpeech(str) {
 	fetch('/getTTS', {
 		method: 'POST',
@@ -316,74 +312,50 @@ let forecastChart = new Chart(document.getElementById('weatherForecastChart'), {
 	}
 });
 
+function parseWeatherForecast(json) {
+	cardsVue.cards.filter(item => item.id === 'weatherForecastCard')[0].title =
+		'Forecast for ' + json.city.name;
+	json.list.forEach(item =>
+		forecastChart.data.labels.push(
+			new Date(item.dt_txt).toLocaleDateString('de-DE', {
+				weekday: 'short',
+				hour: '2-digit',
+				minute: '2-digit'
+			})
+		)
+	);
+	json.list.forEach(item =>
+		forecastChart.data.datasets[0].data.push(
+			(item.main.temp_min - 273.15).toFixed(1)
+		)
+	);
+	json.list.forEach(item =>
+		forecastChart.data.datasets[1].data.push(
+			(item.main.temp_max - 273.15).toFixed(1)
+		)
+	);
+	forecastChart.update();
+}
+
 function GetOWMForecast() {
-	navigator.geolocation.getCurrentPosition(
-		data => {
-			fetch(
-				'https://api.openweathermap.org/data/2.5/forecast?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' +
-					data.coords.longitude +
-					'&lat=' +
-					data.coords.latitude
-			)
-				.then(res => {
-					return res.json();
-				})
-				.then(json => {
-					cardsVue.cards.filter(
-						item => item.id === 'weatherForecastCard'
-					)[0].title = 'Forecast for ' + json.city.name;
-					json.list.forEach(item =>
-						forecastChart.data.labels.push(
-							new Date(item.dt_txt).toLocaleDateString('de-DE', {
-								weekday: 'short',
-								hour: '2-digit',
-								minute: '2-digit'
-							})
-						)
-					);
-					json.list.forEach(item =>
-						forecastChart.data.datasets[0].data.push(
-							(item.main.temp_min - 273.15).toFixed(1)
-						)
-					);
-					json.list.forEach(item =>
-						forecastChart.data.datasets[1].data.push(
-							(item.main.temp_max - 273.15).toFixed(1)
-						)
-					);
-					forecastChart.update();
-				});
-		},
-		() => {
-			fetch(
-				'https://api.openweathermap.org/data/2.5/forecast?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
-			)
-				.then(res => {
-					return res.json();
-				})
-				.then(json => {
-					json.list.forEach(item =>
-						forecastChart.data.labels.push(
-							new Date(item.dt_txt).toLocaleDateString('de-DE', {
-								weekday: 'short',
-								hour: '2-digit',
-								minute: '2-digit'
-							})
-						)
-					);
-					json.list.forEach(item =>
-						forecastChart.data.datasets[0].data.push(
-							(item.main.temp_min - 273.15).toFixed(1)
-						)
-					);
-					json.list.forEach(item =>
-						forecastChart.data.datasets[1].data.push(
-							(item.main.temp_max - 273.15).toFixed(1)
-						)
-					);
-					forecastChart.update();
-				});
-		}
+	fetch(
+		'https://api.openweathermap.org/data/2.5/forecast?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
+	)
+		.then(res => {
+			return res.json();
+		})
+		.then(json => parseWeatherForecast(json));
+	navigator.geolocation.getCurrentPosition(data =>
+		fetch(
+			'https://api.openweathermap.org/data/2.5/forecast?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' +
+				data.coords.longitude +
+				'&lat=' +
+				data.coords.latitude
+		)
+			.then(res => {
+				return res.json();
+			})
+			.then(json => parseWeatherForecast(json))
 	);
 }
 
