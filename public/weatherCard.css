@@ -59,7 +59,7 @@ html {
 
 .tempMinText {
     background: var(--min-temperature-color);
-    margin-right: 3px;
+    margin-right: 5px;
 }
 
 .weatherBadge {
@@ -74,7 +74,7 @@ html {
 
 .tempMaxText {
     background: var(--max-temperature-color);
-    margin-left: 3px;
+    margin-left: 5px;
 }
 
 .currentTempText {
@@ -83,10 +83,10 @@ html {
 
 .humidityText {
     background: #3333ff;
-    margin-left: 3px;
+    margin-left: 5px;
 }
 
 .cloudText {
     background: #aaaaaa;
-    margin-left: 3px;
+    margin-left: 5px;
 }
