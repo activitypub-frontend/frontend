@@ -2,15 +2,18 @@
 html {
     --progress-width: 200px;
 }
+
 #weatherCard .card-content > div {
     display: flex;
     flex-flow: column;
 }
-
+#weatherCard .card-content > div > div {
+    align-self: center;
+}
 .wi {
     font-size: 36pt;
     margin-top: 5px;
-    color: #ff8888;
+    color: var(--header-background);
 }
 
 .weatherProgressContainer {
@@ -27,6 +30,7 @@ html {
     border: none;
     width: var(--progress-width);
     height: 15px;
+
 }
 
 .weatherProgressContainer progress[value]::-webkit-progress-bar {
@@ -70,6 +74,10 @@ html {
 .tempMaxText {
     background: var(--max-temperature-color);
     margin-left: 3px;
+}
+
+.currentTempText {
+    background: var(--current-temp-color);
 }
 
 .humidityText {

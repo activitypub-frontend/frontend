@@ -1,15 +1,22 @@
 @import "weatherCard.css";
 
 html {
-    --text-color: white;
-    --header-background: #FF6F61;
+    --header-text-color: white;
+    /* --header-background: #FF6F61; */
+    --header-background: deepskyblue;
+    --selection: #008;
     --content-background: #eeeeee;
+    --card-background: #ffffff;
     --min-temperature-color: #aaaaff;
-    --max-temperature-color: #ff8888;
+    --max-temperature-color: #ffaaaa;
     background-color: var(--content-background);
 }
 
 body::-webkit-scrollbar {
+    display: none;
+}
+
+#content::-webkit-scrollbar {
     display: none;
 }
 
@@ -22,8 +29,9 @@ body > header {
     padding: 0;
     position: fixed;
     height: 75px;
-    color: var(--text-color);
+    color: var(--header-text-color);
     z-index: 10000;
+    box-shadow: 0 5px 4px 0 rgba(100, 100, 100, 0.5);
 }
 
 header > p {
@@ -58,16 +66,25 @@ header > p {
 .content-card {
     margin: 5px;
     padding: 10px;
-    border-color: #ccc;
+    border-color: var(--card-background);
     min-width: 150px;
     min-height: 150px;
     max-height: 350px;
     max-width: 350px;
     border-width: 3px;
     border-style: solid;
-    background-color: white;
+    background-color: var(--card-background);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow: hidden;
+    box-shadow: 5px 5px 3px 0 rgba(100, 100, 100, 0.5);
+}
+
+.content-card:hover {
+    border-color: var(--header-background);
+}
+
+.content-card:active {
+    border-color: var(--selection);
 }
 
 .content-card > header {
@@ -94,7 +111,7 @@ header > p {
     border-bottom: #223344 solid 1px;
     background-color: #eef;
     border-radius: 4px;
-    padding-left: 3px;
+    padding-left: 7px;
     width: 95%;
 }
 
@@ -113,7 +130,7 @@ button {
     border-radius: 5px;
     border: none;
     padding: 5px;
-    color: var(--text-color);
+    color: var(--header-text-color);
     cursor: pointer;
 }
 
