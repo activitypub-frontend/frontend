@@ -1,6 +1,7 @@
 // import Vue from 'https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.esm.browser.js';
 //import Vue from 'vue';
 import Vue from './vue.js';
+import Chart from './Chart.js';
 
 Vue.component('card', {
 	props: ['card'],
@@ -21,6 +22,9 @@ let weatherCardContent = `<div>
 let ttsCardContent = `<div><input @input="getWikiAutocomplete" type="text" id="wikiSearchInput" list="wikiAutocompleteList" placeholder="Artikel laden..."><button type="button" id="wikiSearchButton" @click="getWikipediaData">Suchen</button></div><datalist id="wikiAutocompleteList"></datalist>
 <p>{{ wikitext }}</p>
 <button type="button" @click="ReadExtract">Vorlesen</button>`;
+
+let weatherForecastCardContent =
+	'<canvas id="weatherForecastChart" width="350" height="320"></canvas>';
 
 let rssCardContent = '<div v-html="rsscontent"></div>';
 
@@ -44,9 +48,9 @@ let cardsVue = new Vue({
 				content: rssCardContent
 			},
 			{
-				title: 'Card 4',
-				content:
-					'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
+				id: 'weatherForecastCard',
+				title: 'Forecast for Stuttgart',
+				content: weatherForecastCardContent
 			},
 			{
 				title: 'Card 5',
@@ -191,7 +195,8 @@ function getWikipediaSummary(title) {
 		.then(
 			json =>
 				(ttsCardVue.wikitext =
-					'extract' in json ? json.extract
+					'extract' in json
+						? json.extract
 						: 'Der Artikel konnte nicht gefunden werden.')
 		);
 }
@@ -267,3 +272,99 @@ function WikipediaAutocomplete(title) {
 			});
 		});
 }
+
+let forecastChart = new Chart(document.getElementById('weatherForecastChart'), {
+	type: 'line',
+	data: {
+		labels: [],
+		datasets: [
+			{
+				label: 'Forecast (Minimum)',
+				data: [],
+				backgroundColor: 'rgba(34, 12, 169, 0.3)',
+				borderColor: 'rgba(34, 12, 169, 1)',
+				borderWidth: 1
+			},
+			{
+				label: 'Forecast (Maximum)',
+				data: [],
+				backgroundColor: 'rgba(169, 12, 34, 0.3)',
+				borderColor: 'rgba(169, 12, 34, 1)',
+				borderWidth: 1
+			}
+		]
+	}
+});
+
+function GetOWMForecast() {
+	navigator.geolocation.getCurrentPosition(
+		data => {
+			fetch(
+				'https://api.openweathermap.org/data/2.5/forecast?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' +
+					data.coords.longitude +
+					'&lat=' +
+					data.coords.latitude
+			)
+				.then(res => {
+					return res.json();
+				})
+				.then(json => {
+					cardsVue.cards.filter(
+						item => item.id === 'weatherForecastCard'
+					)[0].title = 'Forecast for ' + json.city.name;
+					json.list.forEach(item =>
+						forecastChart.data.labels.push(
+							new Date(item.dt_txt).toLocaleDateString('de-DE', {
+								weekday: 'short',
+								hour: '2-digit',
+								minute: '2-digit'
+							})
+						)
+					);
+					json.list.forEach(item =>
+						forecastChart.data.datasets[0].data.push(
+							(item.main.temp_min - 273.15).toFixed(1)
+						)
+					);
+					json.list.forEach(item =>
+						forecastChart.data.datasets[1].data.push(
+							(item.main.temp_max - 273.15).toFixed(1)
+						)
+					);
+					forecastChart.update();
+				});
+		},
+		() => {
+			fetch(
+				'https://api.openweathermap.org/data/2.5/forecast?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
+			)
+				.then(res => {
+					return res.json();
+				})
+				.then(json => {
+					json.list.forEach(item =>
+						forecastChart.data.labels.push(
+							new Date(item.dt_txt).toLocaleDateString('de-DE', {
+								weekday: 'short',
+								hour: '2-digit',
+								minute: '2-digit'
+							})
+						)
+					);
+					json.list.forEach(item =>
+						forecastChart.data.datasets[0].data.push(
+							(item.main.temp_min - 273.15).toFixed(1)
+						)
+					);
+					json.list.forEach(item =>
+						forecastChart.data.datasets[1].data.push(
+							(item.main.temp_max - 273.15).toFixed(1)
+						)
+					);
+					forecastChart.update();
+				});
+		}
+	);
+}
+
+GetOWMForecast();
