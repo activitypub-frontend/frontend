@@ -2,15 +2,18 @@
 html {
     --progress-width: 200px;
 }
+
 #weatherCard .card-content > div {
     display: flex;
     flex-flow: column;
 }
-
+#weatherCard .card-content > div > div {
+    align-self: center;
+}
 .wi {
     font-size: 36pt;
     margin-top: 5px;
-    color: #ff8888;
+    color: var(--header-background);
 }
 
 .weatherProgressContainer {
@@ -27,6 +30,7 @@ html {
     border: none;
     width: var(--progress-width);
     height: 15px;
+
 }
 
 .weatherProgressContainer progress[value]::-webkit-progress-bar {
@@ -46,16 +50,16 @@ html {
 }
 
 .humidityContainer progress[value]::-webkit-progress-value {
-    background-image: -webkit-linear-gradient(left, #eeeeee, #1111ff);
+    background-image: -webkit-linear-gradient(left, #eeeeee, #3333ff);
 }
 
 .cloudContainer progress[value]::-webkit-progress-value {
-    background-image: -webkit-linear-gradient(left, #ffffff, #aaaaaa);
+    background-image: -webkit-linear-gradient(left, #eeeeee, #999999);
 }
 
 .tempMinText {
     background: var(--min-temperature-color);
-    margin-right: 3px;
+    margin-right: 5px;
 }
 
 .weatherBadge {
@@ -63,21 +67,26 @@ html {
     padding: 3px 4px;
     font-size: 10pt;
     font-weight: bold;
-    text-shadow: 1px 1px rgba(0, 0, 0, 0.25);
-    color: #eeeeee;
+    text-shadow: 1px 1px var(--shadow-color);
+    color: var(--content-background);
+    box-shadow: 2px 2px 2px 0 var(--shadow-color);
 }
 
 .tempMaxText {
     background: var(--max-temperature-color);
-    margin-left: 3px;
+    margin-left: 5px;
+}
+
+.currentTempText {
+    background: var(--current-temp-color);
 }
 
 .humidityText {
-    background: #1111ff;
-    margin-left: 3px;
+    background: #3333ff;
+    margin-left: 5px;
 }
 
 .cloudText {
     background: #aaaaaa;
-    margin-left: 3px;
+    margin-left: 5px;
 }
