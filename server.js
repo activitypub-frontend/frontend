@@ -7,7 +7,7 @@ app.use(express.json());
 app.post('/getTTS', (req, res) => {
 	request.post('https://stream.watsonplatform.net/text-to-speech/api/v1/synthesize?voice=de-DE_BirgitVoice', {
 		headers: {
-			Authorization: 'Basic ' + btoa('***REMOVED***'),
+			Authorization: 'Basic ' + btoa(''),
 			Accept: 'audio/mpeg',
 			'Content-Type': 'application/json'
 		},
