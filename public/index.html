@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="theme-color" content="#00BFFF">
+  <title>Test mit Vue</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header>
+    <p>Willkommen bei einem Test von uns!</p>
+    <div class="wi wi-night-clear lightdarkswitch"></div>
+  </header>
+  <div id="content">
+    <card v-for="card in cards" v-bind:key="card.id" v-bind:card="card"></card>
+  </div>
+  <script src="./browserCheck.js"></script>
+  <script src="./index.mjs" type="module"></script>
+</body>
+
+</html>
