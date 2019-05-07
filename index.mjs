@@ -7,12 +7,24 @@ Vue.component('card', {
 <div class="card-content" :id="card.id + '-content'" v-html="card.content"></div></div>`
 });
 
+/**
+ * Mischt zwei Farben in einem Verhältnis.
+ * @param c1 Erste Farbe
+ * @param c2 Zweite Farbe
+ * @param mix Verhältnis zwischen den beiden Farben. 0.0 - Erste Farbe, 1.0 - Zweite Farbe
+ * @returns Gemischte Farbe
+ */
 const ColorMix = (c1, c2, mix) => [
 	c1[0] * (1 - mix) + c2[0] * mix,
 	c1[1] * (1 - mix) + c2[1] * mix,
 	c1[2] * (1 - mix) + c2[2] * mix
 ];
 
+/**
+ * Wandelt eine Zahl in den entsprechenden Hexwert um für CSS-Farben
+ * @param rgb Farbe als Dezimalzahl (0-255)
+ * @returns Hexwert (00-FF)
+ */
 function rgbToHex(rgb) {
 	let hex = Number(Number(rgb).toFixed(0)).toString(16);
 	return hex.length < 2 ? '0' + hex : hex;
