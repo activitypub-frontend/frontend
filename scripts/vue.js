@@ -1,4 +1,3 @@
-/* eslint-disable prefer-spread */
 /* eslint-disable no-invalid-this */
 /* eslint-disable guard-for-in */
 /* eslint-disable prefer-rest-params */
@@ -50,13 +49,8 @@ const toRawType = (value) => _toString.call(value).slice(8, -1);
  * Strict object type check. Only returns true
  * for plain JavaScript objects.
  */
-function isPlainObject(obj) {
-  return _toString.call(obj) === '[object Object]';
-}
-
-function isRegExp(v) {
-  return _toString.call(v) === '[object RegExp]';
-}
+const isPlainObject = (obj) => _toString.call(obj) === '[object Object]';
+const isRegExp = (v) => _toString.call(v) === '[object RegExp]';
 
 /**
  * Check if val is a valid array index.
@@ -172,35 +166,6 @@ const hyphenate = cached((str) => {
 });
 
 /**
- * Simple bind polyfill for environments that do not support it,
- * e.g., PhantomJS 1.x. Technically, we don't need this anymore
- * since native bind is now performant enough in most browsers.
- * But removing it would mean breaking code that was able to run in
- * PhantomJS 1.x, so this must be kept for backward compatibility.
- */
-
-/* istanbul ignore next */
-function polyfillBind(fn, ctx) {
-  function boundFn(a) {
-    const l = arguments.length;
-    return l
-      ? l > 1
-        ? fn.apply(ctx, arguments)
-        : fn.call(ctx, a)
-      : fn.call(ctx);
-  }
-
-  boundFn._length = fn.length;
-  return boundFn;
-}
-
-function nativeBind(fn, ctx) {
-  return fn.bind(ctx);
-}
-
-const bind = Function.prototype.bind ? nativeBind : polyfillBind;
-
-/**
  * Convert an Array-like object to a real Array.
  */
 function toArray(list, start) {
@@ -262,9 +227,7 @@ const identity = (_) => _;
  */
 function genStaticKeys(modules) {
   return modules
-      .reduce((keys, m) => {
-        return keys.concat(m.staticKeys || []);
-      }, [])
+      .reduce((keys, m) => keys.concat(m.staticKeys || []), [])
       .join(',');
 }
 
@@ -506,16 +469,9 @@ function parsePath(path) {
 const hasProto = '__proto__' in {};
 
 // Browser environment sniffing
-const inBrowser = true;
-const inWeex = false; // typeof WXEnvironment !== 'undefined' && !!WXEnvironment.platform;
-const weexPlatform = false; // inWeex && WXEnvironment.platform.toLowerCase();
 const UA = window.navigator.userAgent.toLowerCase();
 const isEdge = UA && UA.indexOf('edge/') > 0;
-// const isAndroid =
-//  (UA && UA.indexOf('android') > 0) || weexPlatform === 'android';
-const isIOS = (UA && /iphone|ipad|ipod|ios/.test(UA)) || weexPlatform === 'ios';
-// const isChrome = UA && /chrome\/\d+/.test(UA) && !isEdge;
-// const isPhantomJS = UA && /phantomjs/.test(UA);
+const isIOS = (UA && /iphone|ipad|ipod|ios/.test(UA));
 const isFF = UA && UA.match(/firefox\/(\d+)/);
 
 // Firefox has a "watch" function on Object.prototype...
@@ -533,30 +489,11 @@ try {
   window.addEventListener('test-passive', null, opts);
 } catch (e) { }
 
-// this needs to be lazy-evaled because vue may be required before
-// vue-server-renderer can set VUE_ENV
-let _isServer;
-const isServerRendering = () => {
-  if (_isServer === undefined) {
-    /* istanbul ignore if */
-    if (!inBrowser && !inWeex && typeof global !== 'undefined') {
-      // detect presence of vue-server-renderer and avoid
-      // Webpack shimming the process
-      _isServer = global.process && global.process.env.VUE_ENV === 'server';
-    } else {
-      _isServer = false;
-    }
-  }
-  return _isServer;
-};
-
 // detect devtools
-const devtools = inBrowser && window.__VUE_DEVTOOLS_GLOBAL_HOOK__;
+const devtools = window.__VUE_DEVTOOLS_GLOBAL_HOOK__;
 
 /* istanbul ignore next */
-function isNative(Ctor) {
-  return typeof Ctor === 'function' && /native code/.test(Ctor.toString());
-}
+const isNative = (Ctor) => typeof Ctor === 'function' && /native code/.test(Ctor.toString());
 
 const hasSymbol =
   typeof Symbol !== 'undefined' &&
@@ -564,56 +501,20 @@ const hasSymbol =
   typeof Reflect !== 'undefined' &&
   isNative(Reflect.ownKeys);
 
-let _Set; // $flow-disable-line
-/* istanbul ignore if */ if (typeof Set !== 'undefined' && isNative(Set)) {
-  // use native Set when available.
-  _Set = Set;
-} else {
-  // a non-standard Set polyfill that only works with primitive keys.
-  _Set = class Set {
-    constructor() {
-      this.set = Object.create(null);
-    }
-    has(key) {
-      return this.set[key] === true;
-    }
-    add(key) {
-      this.set[key] = true;
-    }
-    clear() {
-      this.set = Object.create(null);
-    }
-  };
-}
-
-/*  */
-
 let warn = noop;
-let tip = noop;
+const tip = (...rest) => {};
 let generateComponentTrace = noop; // work around flow check
 let formatComponentName = noop;
 
 {
-  const hasConsole = typeof console !== 'undefined';
   const classifyRE = /(?:^|[-_])(\w)/g;
   const classify = (str) =>
     str.replace(classifyRE, (c) => c.toUpperCase()).replace(/[-_]/g, '');
 
   warn = (msg, vm) => {
     const trace = vm ? generateComponentTrace(vm) : '';
-
     if (config.warnHandler) {
       config.warnHandler.call(null, msg, vm, trace);
-    } else if (hasConsole && !config.silent) {
-      console.error(`[Vue warn]: ${msg}${trace}`);
-    }
-  };
-
-  tip = (msg, vm) => {
-    if (hasConsole && !config.silent) {
-      console.warn(
-          `[Vue tip]: ${msg}` + (vm ? generateComponentTrace(vm) : '')
-      );
     }
   };
 
@@ -721,12 +622,6 @@ class Dep {
   notify() {
     // stabilize the subscriber list first
     const subs = this.subs.slice();
-    if (!config.async) {
-      // subs aren't sorted in scheduler if not running async
-      // we need to sort them now to make sure they fire in correct
-      // order
-      subs.sort((a, b) => a.id - b.id);
-    }
     for (let i = 0, l = subs.length; i < l; i++) {
       subs[i].update();
     }
@@ -998,7 +893,6 @@ function observe(value, asRootData) {
     ob = value.__ob__;
   } else if (
     shouldObserve &&
-    !isServerRendering() &&
     (Array.isArray(value) || isPlainObject(value)) &&
     Object.isExtensible(value) &&
     !value._isVue
@@ -1831,12 +1725,7 @@ function logError(err, vm, info) {
   {
     warn(`Error in ${info}: "${err.toString()}"`, vm);
   }
-  /* istanbul ignore else */
-  if ((inBrowser || inWeex) && typeof console !== 'undefined') {
-    console.error(err);
-  } else {
-    throw err;
-  }
+  console.error(err);
 }
 
 /*  */
@@ -1952,7 +1841,7 @@ let mark;
 let measure;
 
 {
-  const perf = inBrowser && window.performance;
+  const perf = window.performance;
   /* istanbul ignore if */
   if (
     perf &&
@@ -2068,7 +1957,7 @@ let initProxy;
 
 /*  */
 
-const seenObjects = new _Set();
+const seenObjects = new Set();
 
 /**
  * Recursively traverse an object to evoke all converted
@@ -2316,7 +2205,7 @@ function normalizeArrayChildren(children, nestedIndex) {
           res[lastIndex] = createTextVNode(last.text + c[0].text);
           c.shift();
         }
-        res.push.apply(res, c);
+        res.push(...c);
       }
     } else if (isPrimitive(c)) {
       if (isTextNode(last)) {
@@ -2441,7 +2330,7 @@ function resolveSlots(children, context) {
       const name = data.slot;
       const slot = slots[name] || (slots[name] = []);
       if (child.tag === 'template') {
-        slot.push.apply(slot, child.children || []);
+        slot.push(...(child.children || []));
       } else {
         slot.push(child);
       }
@@ -2512,7 +2401,7 @@ function normalizeScopedSlots(slots, normalSlots, prevSlots) {
 
 function normalizeScopedSlot(normalSlots, key, fn) {
   const normalized = function() {
-    let res = arguments.length ? fn.apply(null, arguments) : fn({});
+    let res = arguments.length ? fn(...arguments) : fn({});
     res =
       res && typeof res === 'object' && !Array.isArray(res)
         ? [res] // single vnode
@@ -3647,7 +3536,7 @@ function remove$1(event, fn) {
 function createOnceHandler(event, fn) {
   const _target = target;
   return function onceHandler() {
-    const res = fn.apply(null, arguments);
+    const res = fn(...arguments);
     if (res !== null) {
       _target.$off(event, onceHandler);
     }
@@ -4269,11 +4158,6 @@ function queueWatcher(watcher) {
     // queue the flush
     if (!waiting) {
       waiting = true;
-
-      if (!config.async) {
-        flushSchedulerQueue();
-        return;
-      }
       nextTick(flushSchedulerQueue);
     }
   }
@@ -4311,8 +4195,8 @@ class Watcher {
     this.dirty = this.lazy; // for lazy watchers
     this.deps = [];
     this.newDeps = [];
-    this.depIds = new _Set();
-    this.newDepIds = new _Set();
+    this.depIds = new Set();
+    this.newDepIds = new Set();
     this.expression = expOrFn.toString();
     // parse expression for getter
     if (typeof expOrFn === 'function') {
@@ -4624,8 +4508,6 @@ const computedWatcherOptions = {lazy: true};
 function initComputed(vm, computed) {
   // $flow-disable-line
   const watchers = (vm._computedWatchers = Object.create(null));
-  // computed properties are just getters during SSR
-  const isSSR = isServerRendering();
 
   for (const key in computed) {
     const userDef = computed[key];
@@ -4634,15 +4516,13 @@ function initComputed(vm, computed) {
       warn(`Getter is missing for computed property "${key}".`, vm);
     }
 
-    if (!isSSR) {
-      // create internal watcher for the computed property.
-      watchers[key] = new Watcher(
-          vm,
-          getter || noop,
-          noop,
-          computedWatcherOptions
-      );
-    }
+    // create internal watcher for the computed property.
+    watchers[key] = new Watcher(
+        vm,
+        getter || noop,
+        noop,
+        computedWatcherOptions
+    );
 
     // component-defined computed properties are already defined on the
     // component prototype. We only need to define computed properties defined
@@ -4663,7 +4543,7 @@ function initComputed(vm, computed) {
 }
 
 function defineComputed(target, key, userDef) {
-  const shouldCache = !isServerRendering();
+  const shouldCache = true;
   if (typeof userDef === 'function') {
     sharedPropertyDefinition.get = shouldCache
       ? createComputedGetter(key)
@@ -4733,7 +4613,7 @@ function initMethods(vm, methods) {
       }
     }
     vm[key] =
-      typeof methods[key] !== 'function' ? noop : bind(methods[key], vm);
+      typeof methods[key] !== 'function' ? noop : methods[key].bind(vm);
   }
 }
 
@@ -4820,63 +4700,6 @@ function stateMixin(Vue) {
 
 let uid$3 = 0;
 
-function initMixin(Vue) {
-  Vue.prototype._init = function(options) {
-    const vm = this;
-    // a uid
-    vm._uid = uid$3++;
-
-    let startTag; let endTag;
-    /* istanbul ignore if */
-    if (config.performance && mark) {
-      startTag = `vue-perf-start:${vm._uid}`;
-      endTag = `vue-perf-end:${vm._uid}`;
-      mark(startTag);
-    }
-
-    // a flag to avoid this being observed
-    vm._isVue = true;
-    // merge options
-    if (options && options._isComponent) {
-      // optimize internal component instantiation
-      // since dynamic options merging is pretty slow, and none of the
-      // internal component options needs special treatment.
-      initInternalComponent(vm, options);
-    } else {
-      vm.$options = mergeOptions(
-          resolveConstructorOptions(vm.constructor),
-          options || {},
-          vm
-      );
-    }
-    /* istanbul ignore else */
-    {
-      initProxy(vm);
-    }
-    // expose real self
-    vm._self = vm;
-    initLifecycle(vm);
-    initEvents(vm);
-    initRender(vm);
-    callHook(vm, 'beforeCreate');
-    initInjections(vm); // resolve injections before data/props
-    initState(vm);
-    initProvide(vm); // resolve provide after data/props
-    callHook(vm, 'created');
-
-    /* istanbul ignore if */
-    if (config.performance && mark) {
-      vm._name = formatComponentName(vm, false);
-      mark(endTag);
-      measure(`vue ${vm._name} init`, startTag, endTag);
-    }
-
-    if (vm.$options.el) {
-      vm.$mount(vm.$options.el);
-    }
-  };
-}
-
 function initInternalComponent(vm, options) {
   const opts = (vm.$options = Object.create(vm.constructor.options));
   // doing this because it's faster than dynamic enumeration.
@@ -4933,23 +4756,17 @@ function resolveModifiedOptions(Ctor) {
   return modified;
 }
 
-function Vue(options) {
-  if (!(this instanceof Vue)) {
-    warn('Vue is a constructor and should be called with the `new` keyword');
+class Vue {
+  constructor(options) {
+    this._init(options);
   }
-  this._init(options);
-}
+  // public mount method
+  $mount(el, hydrating) {
+    el = el && query(el);
+    return mountComponent(this, el, hydrating);
+  }
 
-initMixin(Vue);
-stateMixin(Vue);
-eventsMixin(Vue);
-lifecycleMixin(Vue);
-renderMixin(Vue);
-
-/*  */
-
-function initUse(Vue) {
-  Vue.use = function(plugin) {
+  use(plugin) {
     const installedPlugins =
       this._installedPlugins || (this._installedPlugins = []);
     if (installedPlugins.indexOf(plugin) > -1) {
@@ -4960,25 +4777,106 @@ function initUse(Vue) {
     const args = toArray(arguments, 1);
     args.unshift(this);
     if (typeof plugin.install === 'function') {
-      plugin.install.apply(plugin, args);
+      plugin.install(...args);
     } else if (typeof plugin === 'function') {
-      plugin.apply(null, args);
+      plugin(...args);
     }
     installedPlugins.push(plugin);
     return this;
-  };
-}
+  }
 
-/*  */
-
-function initMixin$1(Vue) {
-  Vue.mixin = function(mixin) {
+  mixin(mixin) {
     this.options = mergeOptions(this.options, mixin);
     return this;
-  };
+  }
+
+  get $isServer() {
+    return false;
+  }
+
+  get $ssrContext() {
+    return this.$vnode && this.$vnode.ssrContext;
+  }
+
+  static get version() {
+    return '2.6.10';
+  }
+
+  static get config() {
+    return config;
+  }
+
+  static set config(_value) {
+    warn(
+        'Do not replace the Vue.config object, set individual fields instead.'
+    );
+  }
+
+  static observable(obj) {
+    observe(obj);
+    return obj;
+  }
+
+  _init(options) {
+    const vm = this;
+    // a uid
+    vm._uid = uid$3++;
+
+    let startTag; let endTag;
+    /* istanbul ignore if */
+    if (config.performance && mark) {
+      startTag = `vue-perf-start:${vm._uid}`;
+      endTag = `vue-perf-end:${vm._uid}`;
+      mark(startTag);
+    }
+
+    // a flag to avoid this being observed
+    vm._isVue = true;
+    // merge options
+    if (options && options._isComponent) {
+      // optimize internal component instantiation
+      // since dynamic options merging is pretty slow, and none of the
+      // internal component options needs special treatment.
+      initInternalComponent(vm, options);
+    } else {
+      vm.$options = mergeOptions(
+          resolveConstructorOptions(vm.constructor),
+          options || {},
+          vm
+      );
+    }
+    /* istanbul ignore else */
+    {
+      initProxy(vm);
+    }
+    // expose real self
+    vm._self = vm;
+    initLifecycle(vm);
+    initEvents(vm);
+    initRender(vm);
+    callHook(vm, 'beforeCreate');
+    initInjections(vm); // resolve injections before data/props
+    initState(vm);
+    initProvide(vm); // resolve provide after data/props
+    callHook(vm, 'created');
+
+    /* istanbul ignore if */
+    if (config.performance && mark) {
+      vm._name = formatComponentName(vm, false);
+      mark(endTag);
+      measure(`vue ${vm._name} init`, startTag, endTag);
+    }
+
+    if (vm.$options.el) {
+      vm.$mount(vm.$options.el);
+    }
+  }
 }
 
-/*  */
+stateMixin(Vue);
+eventsMixin(Vue);
+lifecycleMixin(Vue);
+renderMixin(Vue);
 
 function initExtend(Vue) {
   /**
@@ -5220,18 +5118,6 @@ const builtInComponents = {
 /*  */
 
 function initGlobalAPI(Vue) {
-  // config
-  const configDef = {};
-  configDef.get = () => config;
-  {
-    configDef.set = () => {
-      warn(
-          'Do not replace the Vue.config object, set individual fields instead.'
-      );
-    };
-  }
-  Object.defineProperty(Vue, 'config', configDef);
-
   // exposed util methods.
   // NOTE: these are not considered part of the public API - avoid relying on
   // them unless you are aware of the risk.
@@ -5246,12 +5132,6 @@ function initGlobalAPI(Vue) {
   Vue.delete = del;
   Vue.nextTick = nextTick;
 
-  // 2.6 explicit observable API
-  Vue.observable = (obj) => {
-    observe(obj);
-    return obj;
-  };
-
   Vue.options = Object.create(null);
   ASSET_TYPES.forEach((type) => {
     Vue.options[type + 's'] = Object.create(null);
@@ -5263,31 +5143,16 @@ function initGlobalAPI(Vue) {
 
   extend(Vue.options.components, builtInComponents);
 
-  initUse(Vue);
-  initMixin$1(Vue);
   initExtend(Vue);
   initAssetRegisters(Vue);
 }
 
 initGlobalAPI(Vue);
 
-Object.defineProperty(Vue.prototype, '$isServer', {
-  get: isServerRendering,
-});
-
-Object.defineProperty(Vue.prototype, '$ssrContext', {
-  get() {
-    /* istanbul ignore next */
-    return this.$vnode && this.$vnode.ssrContext;
-  },
-});
-
 // expose FunctionalRenderContext for ssr runtime helper installation
 Object.defineProperty(Vue, 'FunctionalRenderContext', {
   value: FunctionalRenderContext,
 });
-
-Vue.version = '2.6.10';
 
 /*  */
 
@@ -5469,10 +5334,6 @@ function getTagNamespace(tag) {
 
 const unknownElementCache = Object.create(null);
 function isUnknownElement(tag) {
-  /* istanbul ignore if */
-  if (!inBrowser) {
-    return true;
-  }
   if (isReservedTag(tag)) {
     return false;
   }
@@ -5836,9 +5697,8 @@ function createPatchFunction(backend) {
 
   function initComponent(vnode, insertedVnodeQueue) {
     if (isDef(vnode.data.pendingInsert)) {
-      insertedVnodeQueue.push.apply(
-          insertedVnodeQueue,
-          vnode.data.pendingInsert
+      insertedVnodeQueue.push(
+          ...vnode.data.pendingInsert
       );
       vnode.data.pendingInsert = null;
     }
@@ -6353,7 +6213,7 @@ function createPatchFunction(backend) {
           ) {
             if (i !== elm.innerHTML) {
               /* istanbul ignore if */
-              if (typeof console !== 'undefined' && !hydrationBailed) {
+              if (true && !hydrationBailed) {
                 hydrationBailed = true;
                 console.warn('Parent: ', elm);
                 console.warn('server innerHTML: ', i);
@@ -6379,7 +6239,7 @@ function createPatchFunction(backend) {
             // longer than the virtual children list.
             if (!childrenMatch || childNode) {
               /* istanbul ignore if */
-              if (typeof console !== 'undefined' && !hydrationBailed) {
+              if (true && !hydrationBailed) {
                 hydrationBailed = true;
                 console.warn('Parent: ', elm);
                 console.warn(
@@ -6890,13 +6750,9 @@ function wrapFilter(exp, filter) {
   }
 }
 
-/*  */
-
-/* eslint-disable no-unused-vars */
-function baseWarn(msg, range) {
+function baseWarn(msg, _range) {
   console.error(`[Vue compiler]: ${msg}`);
 }
-/* eslint-enable no-unused-vars */
 
 function pluckModuleFunction(modules, key) {
   return modules ? modules.map((m) => m[key]).filter((_) => _) : [];
@@ -7911,12 +7767,7 @@ if (hasTransition) {
   }
 }
 
-// binding to window is necessary to make hot reload work in IE in strict mode
-const raf = inBrowser
-  ? window.requestAnimationFrame
-    ? window.requestAnimationFrame.bind(window)
-    : setTimeout
-  : /* istanbul ignore next */ (fn) => fn();
+const raf = window.requestAnimationFrame.bind(window);
 
 function nextFrame(fn) {
   raf(() => {
@@ -8345,20 +8196,18 @@ function _enter(_, vnode) {
   }
 }
 
-const transition = inBrowser
-  ? {
-    create: _enter,
-    activate: _enter,
-    remove(vnode, rm) {
-      /* istanbul ignore else */
-      if (vnode.data.show !== true) {
-        leave(vnode, rm);
-      } else {
-        rm();
-      }
-    },
-  }
-  : {};
+const transition = {
+  create: _enter,
+  activate: _enter,
+  remove(vnode, rm) {
+    /* istanbul ignore else */
+    if (vnode.data.show !== true) {
+      leave(vnode, rm);
+    } else {
+      rm();
+    }
+  },
+};
 
 const platformModules = [attrs, klass, events, domProps, style, transition];
 
@@ -8942,37 +8791,8 @@ extend(Vue.options.directives, platformDirectives);
 extend(Vue.options.components, platformComponents);
 
 // install platform patch function
-Vue.prototype.__patch__ = inBrowser ? patch : noop;
+Vue.prototype.__patch__ = patch;
 
-// public mount method
-Vue.prototype.$mount = function(el, hydrating) {
-  el = el && inBrowser ? query(el) : undefined;
-  return mountComponent(this, el, hydrating);
-};
-
-// devtools global hook
-/* istanbul ignore next */
-if (inBrowser) {
-  setTimeout(() => {
-    if (config.devtools) {
-      if (devtools) {
-        devtools.emit('init', Vue);
-      } else {
-        console[console.info ? 'info' : 'log'](
-            'Download the Vue Devtools extension for a better development experience:\n' +
-          'https://github.com/vuejs/vue-devtools'
-        );
-      }
-    }
-    if (config.productionTip !== false && typeof console !== 'undefined') {
-      console[console.info ? 'info' : 'log'](
-          'You are running Vue in development mode.\n' +
-        'Make sure to turn on production mode when deploying for production.\n' +
-        'See more tips at https://vuejs.org/guide/deployment.html'
-      );
-    }
-  }, 0);
-}
 
 /*  */
 
@@ -9672,7 +9492,7 @@ function parse(template, options) {
         });
       }
 
-      if (isForbiddenTag(element) && !isServerRendering()) {
+      if (isForbiddenTag(element)) {
         element.forbidden = true;
         warn$2(
             'Templates should only be responsible for mapping the state to the ' +
@@ -10642,19 +10462,15 @@ const keyCodes = {
 
 // KeyboardEvent.key aliases
 const keyNames = {
-  // #7880: IE11 and Edge use `Esc` for Escape key name.
-  esc: ['Esc', 'Escape'],
+  esc: 'Escape',
   tab: 'Tab',
   enter: 'Enter',
-  // #9112: IE11 uses `Spacebar` for Space key name.
-  space: [' ', 'Spacebar'],
-  // #7806: IE11 uses key names without `Arrow` prefix for arrow keys.
-  up: ['Up', 'ArrowUp'],
-  left: ['Left', 'ArrowLeft'],
-  right: ['Right', 'ArrowRight'],
-  down: ['Down', 'ArrowDown'],
-  // #9112: IE11 uses `Del` for Delete key name.
-  delete: ['Backspace', 'Delete', 'Del'],
+  space: ' ',
+  up: 'ArrowUp',
+  left: 'ArrowLeft',
+  right: 'ArrowRight',
+  down: 'ArrowDown',
+  delete: ['Backspace', 'Delete'],
 };
 
 // #4868: modifiers that prevent the execution of the listener
@@ -11733,9 +11549,9 @@ function getShouldDecode(href) {
 }
 
 // #3663: IE encodes newlines inside attribute values while other browsers don't
-const shouldDecodeNewlines = inBrowser ? getShouldDecode(false) : false;
+const shouldDecodeNewlines = getShouldDecode(false);
 // #6828: chrome encodes content in a[href]
-const shouldDecodeNewlinesForHref = inBrowser ? getShouldDecode(true) : false;
+const shouldDecodeNewlinesForHref = getShouldDecode(true);
 
 /*  */
 

@@ -1,3 +1,5 @@
+/* eslint-disable valid-jsdoc */
+/* eslint-disable prefer-const */
 /* eslint-disable guard-for-in */
 /* eslint-disable no-invalid-this */
 /* eslint-disable prefer-spread */

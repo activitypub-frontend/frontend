@@ -1,5 +1,6 @@
 @import "weatherCard.css";
 @import "vvsCard.css";
+@import "rssCard.css";
 
 html {
     --header-text-color: white;
@@ -108,33 +109,10 @@ header > p {
     padding-bottom: 5px;
 }
 
-#ttsCard > .card-content, #rssCard > .card-content {
+#ttsCard > .card-content, #rssCard > .card-content, #vvsCard > .card-content{
     overflow-y: auto;
     overflow-x: hidden;
     max-height: 83%;
-}
-
-#rssCard {
-    display: flex;
-    flex-flow: column;
-}
-
-#rssCard article {
-    border-bottom: #223344 solid 1px;
-    background-color: var(--content-background);
-    border-radius: 4px;
-    padding-left: 7px;
-    width: 95%;
-}
-
-#rssCard img {
-    width: 95%;
-    border-radius: 3px;
-}
-
-#rssCard h1 a {
-    font-size: 14pt;
-    color: var(--content-text-color);
 }
 
 button {
