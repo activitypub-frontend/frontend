@@ -57,11 +57,25 @@ html {
     background-image: -webkit-linear-gradient(left, #eeeeee, #999999);
 }
 
+.temperatureContainer progress[value]::-moz-progress-bar {
+    background-image: -moz-linear-gradient(left, #aaaaff, #ff8888);
+}
+
+.humidityContainer progress[value]::-moz-progress-bar {
+    background-image: -moz-linear-gradient(left, #eeeeee, #3333ff);
+}
+
+.cloudContainer progress[value]::-moz-progress-bar {
+    background-image: -moz-linear-gradient(left, #eeeeee, #999999);
+}
+
 .tempMinText {
     background: var(--min-temperature-color);
     margin-right: 5px;
 }
-
+html.dark .weatherBadge {
+    color: var(--content-text-color);
+}
 .weatherBadge {
     border-radius: 5px;
     padding: 3px 4px;

@@ -6,6 +6,7 @@
 
 import Vue from './vue.js';
 import Chart from './Chart.js';
+import rssFeed from './rssFeed.js';
 
 /**
  * Mischt zwei Farben in einem Verhältnis,
@@ -51,8 +52,8 @@ function parseWeatherData(json) {
   const color = mixColor(
       [255, 170, 170],
       [170, 170, 255],
-      (json.main.temp - 273.15 - (json.main.temp_min - 273.15)) /
-      (json.main.temp_min - 273.15)
+      ((json.main.temp - 273.15 - (json.main.temp_min - 273.15)) /
+      (json.main.temp_min - 273.15))
   );
   document.documentElement.style.setProperty(
       '--current-temp-color',
@@ -220,53 +221,8 @@ function getWikipediaSummary(title) {
  * Gets the Heise RSS feed.
  */
 function getRSSFeed() {
-  const container = document.createElement('div');
-  container.className = 'rss-container';
-  const url = 'https://www.heise.de/rss/heise.rdf';
-  fetch('/getFile', {
-    method: 'POST',
-    body: JSON.stringify({url: url}),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-      .then((res) => res.text())
-      .then((text) => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, 'text/xml');
-        Array.from(doc.querySelectorAll('item'))
-            .slice(0, 10)
-            .forEach((item) => {
-              const article = document.createElement('article');
-              const heading = document.createElement('h1');
-              const headingLink = document.createElement('a');
-              headingLink.rel = 'noreferrer';
-              headingLink.target = '_blank';
-              headingLink.href = item.querySelector('guid').textContent;
-              headingLink.textContent = item.querySelector(
-                  'title'
-              ).textContent;
-              heading.appendChild(headingLink);
-              article.appendChild(heading);
-              const published = document.createElement('div');
-              published.textContent =
-            'Erschienen ' +
-              new Date(
-                  Date.parse(item.querySelector('pubDate').innerHTML)
-              ).toLocaleString('de-DE');
-              article.appendChild(published);
-              const content = document.createElement('div');
-              content.innerHTML = item.getElementsByTagName(
-                  'content:encoded'
-              )[0].childNodes[0].data;
-              article.appendChild(content);
-              container.appendChild(article);
-              rssCardVue.rsscontent = container.outerHTML;
-            });
-      });
+  rssFeed('https://www.heise.de/rss/heise.rdf').then((container) => rssCardVue.rsscontent = container.outerHTML, (_reason) => {});
 }
-
-getRSSFeed();
 
 /**
  * Get the data for autocomplete Wikipedia article names
@@ -387,9 +343,19 @@ function getVVSData() {
   }).then((res) => res.json()).then((json) => {
     const div = document.createElement('div');
     json.departureList.forEach((el) => {
+      const realTime = new Date(el.realDateTime.year, el.realDateTime.month - 1, el.realDateTime.day, el.realDateTime.hour, el.realDateTime.minute);
+      const expectedTime = new Date(el.dateTime.year, el.dateTime.month - 1, el.dateTime.day, el.dateTime.hour, el.dateTime.minute);
+      const delay = realTime > expectedTime;
       const row = document.createElement('article');
       const lineBadge = document.createElement('span');
       lineBadge.textContent = el.servingLine.number;
+      if (el.servingLine.number[0] === 'S') {
+        lineBadge.classList.add('sBahnBadge');
+      } else if (el.servingLine.number[0] === 'U') {
+        lineBadge.classList.add('uBahnBadge');
+      } else {
+        lineBadge.classList.add('busBadge');
+      }
       lineBadge.classList.add('lineBadge');
       row.appendChild(lineBadge);
       const destText = document.createElement('span');
@@ -398,6 +364,9 @@ function getVVSData() {
       row.appendChild(destText);
       const countdownText = document.createElement('span');
       countdownText.textContent = 'in ' + el.countdown + ' min';
+      if (delay) {
+        countdownText.classList.add('delayed');
+      }
       row.appendChild(countdownText);
       div.appendChild(row);
     });
@@ -405,8 +374,12 @@ function getVVSData() {
   });
 }
 
-setInterval(() => getVVSData(), 60 * 1000);
+setInterval(() => {
+  getVVSData();
+  getRSSFeed();
+}, 60 * 1000);
 getVVSData();
+getRSSFeed();
 
 document.querySelector('.lightdarkswitch').onclick = () => {
   document.querySelector('html').classList.toggle('dark');

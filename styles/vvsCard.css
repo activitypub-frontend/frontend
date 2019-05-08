@@ -18,5 +18,28 @@
     box-shadow: 2px 2px 2px 0 var(--shadow-color);
     margin-top: 3px;
     margin-bottom: 3px;
-    background-color: darkcyan;
+}
+
+html.dark .lineBadge {
+    color: var(--content-text-color);
+}
+
+.sBahnBadge {
+    background-color: green;
+}
+
+.uBahnBadge {
+    background-color: blue;
+}
+
+.busBadge {
+    background-color: red;
+}
+
+.delayed {
+    color: red;
+}
+
+.destination {
+    font-weight: bold;
 }
