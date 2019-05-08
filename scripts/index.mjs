@@ -2,17 +2,10 @@
  * The functions for the site
  */
 
+'use strict';
+
 import Vue from './vue.js';
 import Chart from './Chart.js';
-
-Vue.component('card', {
-  props: ['card'],
-  template: `<div :id="card.id" class="content-card">
-  <header>{{ card.title }}</header>
-  <div class="card-content" :id="card.id + '-content'" v-html="card.content">
-  </div>
-</div>`,
-});
 
 /**
  * Mischt zwei Farben in einem Verhältnis,
@@ -48,8 +41,7 @@ function rgbToHex(rgb) {
  * @param {object} json JSON to be parsed for current weather
  */
 function parseWeatherData(json) {
-  cardsVue.cards.filter((item) => item.id === 'weatherCard')[0].title =
-  'Current weather in ' + json.name;
+  weatherCardVue.title = 'Current weather in ' + json.name;
   weatherCardVue.temp = json.main.temp;
   weatherCardVue.temp_max = json.main.temp_max;
   weatherCardVue.temp_min = json.main.temp_min;
@@ -68,81 +60,10 @@ function parseWeatherData(json) {
   );
 }
 
-const weatherCardContent = `<div>
-  <div :class="weatherClass"></div>
-  <p>Current temperature: 
-    <span class="currentTempText weatherBadge">{{ currentTemp }}</span>
-  </p>
-  <div class="temperatureContainer weatherProgressContainer">
-    <span class="tempMinText weatherBadge">{{ minTemp }}</span>
-    <progress :max="tempMaxProgress" :value="tempProgress"></progress>
-    <span class="tempMaxText weatherBadge">{{ maxTemp }}</span>
-  </div>
-  <p>Humidity:</p>
-  <div class="humidityContainer weatherProgressContainer">
-    <progress max="100" :value="humidity"></progress>
-    <span class="humidityText weatherBadge">{{ humidity }} %</span>
-  </div>
-  <p>Cloud density:</p>
-  <div class="cloudContainer weatherProgressContainer">
-    <progress max="100" :value="clouds"></progress>
-    <span class="cloudText weatherBadge">{{ clouds }} %</span>
-  </div>
-</div>`;
-
-/* eslint-disable max-len */
-const ttsCardContent = `<div>
-  <input @input="getWikiAutocomplete" type="text" id="wikiSearchInput" list="wikiAutocompleteList" placeholder="Load article...">
-  <button type="button" id="wikiSearchButton" @click="getWikipediaData">Search</button>
-</div>
-<datalist id="wikiAutocompleteList"></datalist>
-<p>{{ wikitext }}</p>
-<button type="button" @click="ReadExtract">Read aloud</button>`;
-/* eslint-enable max-len */
-
-const weatherForecastCardContent =
-  '<canvas id="weatherForecastChart" width="350" height="320"></canvas>';
-
-const rssCardContent = '<div v-html="rsscontent"></div>';
-
-const vvsCardContent = '<div v-html="vvscontent"></div>';
-
-const cardsVue = new Vue({
-  el: '#content',
-  data: {
-    cards: [
-      {
-        id: 'weatherCard',
-        title: 'Current weather in Stuttgart',
-        content: weatherCardContent,
-      },
-      {
-        id: 'ttsCard',
-        title: 'Text-to-Speech from Wikipedia',
-        content: ttsCardContent,
-      },
-      {
-        id: 'rssCard',
-        title: 'RSS Feed from Heise',
-        content: rssCardContent,
-      },
-      {
-        id: 'weatherForecastCard',
-        title: 'Forecast for Stuttgart',
-        content: weatherForecastCardContent,
-      },
-      {
-        id: 'vvsCard',
-        title: 'Next departures from Stadtmitte',
-        content: vvsCardContent,
-      },
-    ],
-  },
-});
-
 const ttsCardVue = new Vue({
   el: '#ttsCard',
   data: {
+    title: 'Text-to-Speech from Wikipedia',
     wikitext: 'Use the search to view any article.',
   },
   methods: {
@@ -167,6 +88,7 @@ const ttsCardVue = new Vue({
 const rssCardVue = new Vue({
   el: '#rssCard',
   data: {
+    title: 'RSS-Feed from Heise',
     rsscontent: '',
   },
 });
@@ -174,13 +96,15 @@ const rssCardVue = new Vue({
 const vvsCardVue = new Vue({
   el: '#vvsCard',
   data: {
+    title: 'Next departures from Stadtmitte',
     vvscontent: '',
   },
 });
 
 const weatherCardVue = new Vue({
-  el: '#weatherCard-content',
+  el: '#weatherCard',
   data: {
+    title: 'Current weather in Stuttgart',
     temp: 273.15,
     temp_max: 273.15,
     temp_min: 273.15,
@@ -213,6 +137,13 @@ const weatherCardVue = new Vue({
     weatherClass: function() {
       return 'wi wi-owm-' + this.weathercode;
     },
+  },
+});
+
+const weatherForecastCardVue = new Vue({
+  el: '#weatherForecastCard',
+  data: {
+    title: 'Weather forecast in Stuttgart',
   },
 });
 
@@ -392,7 +323,7 @@ const forecastChart = new Chart(
 * @param {object} json The data for the weather forecast
 */
 function parseWeatherForecast(json) {
-  cardsVue.cards.filter((item) => item.id === 'weatherForecastCard')[0].title =
+  weatherForecastCardVue.title =
     'Forecast for ' + json.city.name;
   json.list.forEach((item) =>
     forecastChart.data.labels.push(

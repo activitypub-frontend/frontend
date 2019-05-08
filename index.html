@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#00BFFF">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Test mit Vue</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles/style.css">
 </head>
 
 <body>
@@ -15,10 +15,57 @@
     <div class="wi wi-night-clear lightdarkswitch"></div>
   </header>
   <div id="content">
-    <card v-for="card in cards" v-bind:key="card.id" v-bind:card="card"></card>
+    <card id="weatherCard" class="content-card">
+      <header>{{ title }}</header>
+      <div class="card-content" id="weatherCard-content">
+        <div>
+          <div :class="weatherClass"></div>
+          <p>Current temperature:
+            <span class="currentTempText weatherBadge">{{ currentTemp }}</span>
+          </p>
+          <div class="temperatureContainer weatherProgressContainer">
+            <span class="tempMinText weatherBadge">{{ minTemp }}</span>
+            <progress :max="tempMaxProgress" :value="tempProgress"></progress>
+            <span class="tempMaxText weatherBadge">{{ maxTemp }}</span>
+          </div>
+          <p>Humidity:</p>
+          <div class="humidityContainer weatherProgressContainer">
+            <progress max="100" :value="humidity"></progress>
+            <span class="humidityText weatherBadge">{{ humidity }} %</span>
+          </div>
+          <p>Cloud density:</p>
+          <div class="cloudContainer weatherProgressContainer">
+            <progress max="100" :value="clouds"></progress>
+            <span class="cloudText weatherBadge">{{ clouds }} %</span>
+          </div>
+        </div>
+      </div>
+    </card>
+    <card id="ttsCard" class="content-card">
+        <header>{{ title }}</header>
+        <div>
+            <input @input="getWikiAutocomplete" type="text" id="wikiSearchInput" list="wikiAutocompleteList" placeholder="Load article...">
+            <button type="button" id="wikiSearchButton" @click="getWikipediaData">Search</button>
+          </div>
+          <datalist id="wikiAutocompleteList"></datalist>
+          <p>{{ wikitext }}</p>
+          <button type="button" @click="ReadExtract">Read aloud</button>
+    </card>
+    <card id="rssCard" class="content-card">
+        <header>{{ title }}</header>
+        <div id="rssCard-content" class="card-content" v-html="rsscontent"></div>
+    </card>
+    <card id="weatherForecastCard" class="content-card">
+        <header>{{ title }}</header>
+        <canvas id="weatherForecastChart" class="card-content" width="350" height="320"></canvas>
+    </card>
+    <card id="vvsCard" class="content-card">
+        <header>{{ title }}</header>
+        <div id="vvsCard-content" class="card-content" v-html="vvscontent"></div>
+    </card>
   </div>
-  <script src="./browserCheck.js"></script>
-  <script src="./index.mjs" type="module"></script>
+  <script src="scripts/browserCheck.js"></script>
+  <script src="scripts/index.mjs" type="module"></script>
 </body>
 
 </html>

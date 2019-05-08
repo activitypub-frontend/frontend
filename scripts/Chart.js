@@ -1,3 +1,7 @@
+/* eslint-disable no-invalid-this */
+/* eslint-disable guard-for-in */
+/* eslint-disable no-var */
+/* eslint-disable prefer-const */
 /* eslint-disable new-cap */
 /* eslint-disable prefer-spread */
 /* eslint-disable prefer-rest-params */
