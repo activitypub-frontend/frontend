@@ -1,4 +1,5 @@
 @import "weatherCard.css";
+@import "vvsCard.css";
 
 html {
     --header-text-color: white;
