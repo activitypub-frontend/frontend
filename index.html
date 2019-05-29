@@ -42,30 +42,35 @@
       </div>
     </card>
     <card id="ttsCard" class="content-card">
-        <header>{{ title }}</header>
-        <div>
-            <input @input="getWikiAutocomplete" type="text" id="wikiSearchInput" list="wikiAutocompleteList" placeholder="Load article...">
-            <button type="button" id="wikiSearchButton" @click="getWikipediaData">Search</button>
-          </div>
-          <datalist id="wikiAutocompleteList"></datalist>
-          <p>{{ wikitext }}</p>
-          <button type="button" @click="ReadExtract">Read aloud</button>
+      <header>{{ title }}</header>
+      <div>
+        <input @input="getWikiAutocomplete" type="text" id="wikiSearchInput" list="wikiAutocompleteList" placeholder="Load article...">
+        <button type="button" id="wikiSearchButton" @click="getWikipediaData">Search</button>
+      </div>
+      <datalist id="wikiAutocompleteList"></datalist>
+      <p>{{ wikitext }}</p>
+      <button type="button" @click="ReadExtract">Read aloud</button>
     </card>
     <card id="rssCard" class="content-card">
-        <header>{{ title }}</header>
-        <div id="rssCard-content" class="card-content" v-html="rsscontent"></div>
+      <header>{{ title }}</header>
+      <div id="rssCard-content" class="card-content" v-html="rsscontent"></div>
     </card>
     <card id="weatherForecastCard" class="content-card">
-        <header>{{ title }}</header>
-        <canvas id="weatherForecastChart" class="card-content" width="350" height="320"></canvas>
+      <header>{{ title }}</header>
+      <canvas id="weatherForecastChart" class="card-content" width="350" height="320"></canvas>
     </card>
     <card id="vvsCard" class="content-card">
-        <header>{{ title }}</header>
-        <div id="vvsCard-content" class="card-content" v-html="vvscontent"></div>
+      <header>{{ title }}</header>
+      <div id="vvsCard-content" class="card-content" v-html="vvscontent"></div>
     </card>
     <card id="mastodonCard" class="content-card">
-        <header>{{ title }}</header>
-        <div id="mastodonCard-content" class="card-content" v-html="mastodoncontent"></div>
+      <header>{{ title }}</header>
+      <div id="mastodonCard-content" class="card-content" v-html="mastodoncontent">
+        <div>
+          <input type="text" id="mastodonInstance" placeholder="Your instance (e.g. mastodon.social)">
+          <button type="button" id="mastodonLoginClick" @click="mastodonLogin">Search</button>
+        </div>
+      </div>
     </card>
   </div>
   <script src="scripts/browserCheck.js"></script>
