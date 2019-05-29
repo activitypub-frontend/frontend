@@ -1,28 +1,27 @@
 // import Vue from './vue.js';
-document.addEventListener("DOMContentLoaded", function(event) {
-  const mastodonCardVue = new Vue({
-    el: '#mastodonCard',
-    data: {
-      title: 'Your Mastodon-Feed',
-      mastodoncontent: '',
-    },
-    created: function() {
-      console.log('Vue instance was created');
-    },
-    methods: {
-      mastodonLogin: function(event) {
 
-        const mInstance = document.getElementById('mastodonInstance').value;
-        console.log("Auth with "+mInstance);
-        doMastodonAuth(mInstance);
-      },
-      say: function(message) {
-        alert(message)
-      }
+const mastodonCardVue = new Vue({
+  el: '#mastodonCard',
+  data: {
+    title: 'Your Mastodon-Feed',
+    mastodoncontent: '',
+  },
+  created: function() {
+    console.log('Vue instance was created');
+  },
+  methods: {
+    mastodonLogin: function(event) {
+
+      const mInstance = document.getElementById('mastodonInstance').value;
+      console.log("Auth with " + mInstance);
+      doMastodonAuth(mInstance);
+    },
+    say: function(message) {
+      alert(message)
     }
-  });
-
+  }
 });
+
 
 function initMastodon() {
   // ToDo: Check Cookie
@@ -34,6 +33,12 @@ function initMastodon() {
 }
 
 function doMastodonAuth(mInstance) {
+  if(mInstance.length<5) {
+    mastodonCardVue.mastodoncontent = `
+      Invalid Instance.
+    `;
+    return;
+  }
   fetch('/mastodon/' + mInstance + '/oauth', {
     method: 'GET'
   }).then((res) => res.json()).then((json) => {
