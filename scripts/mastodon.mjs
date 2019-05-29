@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
       title: 'Your Mastodon-Feed',
       mastodoncontent: '',
     },
+    created: function() {
+      console.log('Vue instance was created');
+    },
     methods: {
       mastodonLogin: function(event) {
         const mInstance = document.getElementById('mastodonInstance').value;
