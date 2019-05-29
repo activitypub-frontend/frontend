@@ -1,20 +1,20 @@
 import Vue from './vue.js';
-import Chart from './Chart.js';
-import rssFeed from './rssFeed.js';
-
-const mastodonCardVue = new Vue({
-  el: '#mastodonCard',
-  data: {
-    title: 'Your Mastodon-Feed',
-    mastodoncontent: '',
-  },
-  methods: {
-    mastodonLogin: function() {
-      const mInstance = document.getElementById('mastodonInstance').value;
-      console.log("Auth");
-      doMastodonAuth(mInstance);
+document.addEventListener("DOMContentLoaded", function(event) {
+  const mastodonCardVue = new Vue({
+    el: '#mastodonCard',
+    data: {
+      title: 'Your Mastodon-Feed',
+      mastodoncontent: '',
+    },
+    methods: {
+      mastodonLogin: function(event) {
+        const mInstance = document.getElementById('mastodonInstance').value;
+        console.log("Auth");
+        doMastodonAuth(mInstance);
+      }
     }
-  }
+  });
+
 });
 
 function initMastodon() {
