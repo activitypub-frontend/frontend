@@ -106,6 +106,10 @@ const mastodonCardVue = new Vue({
   el: '#mastodonCard',
   data: {
     title: 'Your Mastodon-Feed',
+    mastodoncontent: `  <div>
+          <input type="text" id="mastodonInstance" placeholder="Your instance (e.g. mastodon.social)">
+          <button type="button" id="mastodonLoginClick" @click="mastodonLogin">Search</button>
+      </div>`,
   },
   methods: {
     mastodonLogin: function() {
