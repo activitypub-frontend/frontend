@@ -109,11 +109,9 @@ const mastodonCardVue = new Vue({
     mastodoncontent: '',
   },
   methods: {
-    getMastodonLogin: function() {
+    mastodonLogin: function() {
       const mInstance = document.getElementById('mastodonInstance').value;
-      if (title !== '') {
-        doMastodonAuth(mInstance);
-      }
+      doMastodonAuth(mInstance);
     }
   }
 });
