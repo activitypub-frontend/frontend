@@ -1,4 +1,4 @@
-import Vue from './vue.js';
+// import Vue from './vue.js';
 document.addEventListener("DOMContentLoaded", function(event) {
   const mastodonCardVue = new Vue({
     el: '#mastodonCard',

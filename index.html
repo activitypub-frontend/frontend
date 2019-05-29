@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Test mit Vue</title>
   <link rel="stylesheet" href="styles/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 </head>
 
 <body>
@@ -69,7 +70,7 @@
 
         <input type="text" id="mastodonInstance" placeholder="Your instance (e.g. mastodon.social)">
         <button type="button" id="mastodonLoginClick" v-on:click="mastodonLogin">Authenticate</button>
- <button v-on:click="say('what')">Say what</button>
+ <button v-on:click="say('what')" onclick="alert('2')">Say what</button>
       <div id="mastodonCard-content" class="card-content" v-html="mastodoncontent">
       </div>
     </card>
