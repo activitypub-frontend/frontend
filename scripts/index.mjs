@@ -106,7 +106,6 @@ const mastodonCardVue = new Vue({
   el: '#mastodonCard',
   data: {
     title: 'Your Mastodon-Feed',
-    mastodoncontent: '',
   },
   methods: {
     mastodonLogin: function() {
@@ -400,7 +399,7 @@ function initMastodon() {
   // ToDo: Check Valid session
 
   // ToDo: Check if code is available
-  
+
 }
 
 function doMastodonAuth(mInstance) {
