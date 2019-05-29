@@ -1,3 +1,7 @@
+import Vue from './vue.js';
+import Chart from './Chart.js';
+import rssFeed from './rssFeed.js';
+
 const mastodonCardVue = new Vue({
   el: '#mastodonCard',
   data: {
