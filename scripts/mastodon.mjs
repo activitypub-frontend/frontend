@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     },
     methods: {
       mastodonLogin: function(event) {
+                console.log("Auth");
         const mInstance = document.getElementById('mastodonInstance').value;
         console.log("Auth");
         doMastodonAuth(mInstance);
