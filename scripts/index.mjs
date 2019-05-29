@@ -102,24 +102,6 @@ const vvsCardVue = new Vue({
   },
 });
 
-const mastodonCardVue = new Vue({
-  el: '#mastodonCard',
-  data: {
-    title: 'Your Mastodon-Feed',
-    mastodoncontent: `  <div>
-          <input type="text" id="mastodonInstance" placeholder="Your instance (e.g. mastodon.social)">
-          <button type="button" id="mastodonLoginClick" @click="mastodonLogin">Authenticate</button>
-      </div>`,
-  },
-  methods: {
-    mastodonLogin: function() {
-      const mInstance = document.getElementById('mastodonInstance').value;
-      doMastodonAuth(mInstance);
-    }
-  }
-});
-
-
 const weatherCardVue = new Vue({
   el: '#weatherCard',
   data: {
@@ -397,40 +379,13 @@ function getVVSData() {
   });
 }
 
-function initMastodon() {
-  // ToDo: Check Cookie
-
-  // ToDo: Check Valid session
-
-  // ToDo: Check if code is available
-
-}
-
-function doMastodonAuth(mInstance) {
-  fetch('/mastodon/' + mInstance + '/oauth', {
-    method: 'GET'
-  }).then((res) => res.json()).then((json) => {
-    if (!json.client_id) {
-      throw "No client_id";
-    }
-    if (!json.success) {
-      throw "Server Side Problem";
-    }
-    window.location.replace("https://" + mInstance + "/oauth/authorize?scope=read&response_type=code&redirect_uri=https://dashboard.tinf17.in&client_id=" + json.client_id);
-  }).catch((e) => {
-    mastodonCardVue.mastodoncontent = `
-      Login failed.
-    `;
-
-  });
-}
 setInterval(() => {
   getVVSData();
   getRSSFeed();
 }, 60 * 1000);
 getVVSData();
 getRSSFeed();
-initMastodon();
+
 document.querySelector('.lightdarkswitch').onclick = () => {
   document.querySelector('html').classList.toggle('dark');
   document.querySelector('.lightdarkswitch').classList.toggle('wi-day-sunny');

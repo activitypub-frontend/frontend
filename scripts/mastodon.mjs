@@ -1,0 +1,42 @@
+const mastodonCardVue = new Vue({
+  el: '#mastodonCard',
+  data: {
+    title: 'Your Mastodon-Feed',
+    mastodoncontent: '',
+  },
+  methods: {
+    mastodonLogin: function() {
+      const mInstance = document.getElementById('mastodonInstance').value;
+      console.log("Auth");
+      doMastodonAuth(mInstance);
+    }
+  }
+});
+
+function initMastodon() {
+  // ToDo: Check Cookie
+
+  // ToDo: Check Valid session
+
+  // ToDo: Check if code is available
+
+}
+
+function doMastodonAuth(mInstance) {
+  fetch('/mastodon/' + mInstance + '/oauth', {
+    method: 'GET'
+  }).then((res) => res.json()).then((json) => {
+    if (!json.client_id) {
+      throw "No client_id";
+    }
+    if (!json.success) {
+      throw "Server Side Problem";
+    }
+    window.location.replace("https://" + mInstance + "/oauth/authorize?scope=read&response_type=code&redirect_uri=https://dashboard.tinf17.in&client_id=" + json.client_id);
+  }).catch((e) => {
+    mastodonCardVue.mastodoncontent = `
+      Login failed.
+    `;
+
+  });
+}
