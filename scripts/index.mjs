@@ -23,9 +23,9 @@ const mixColor = (c1, c2, mix) => [
   c1[2] * (1 - mix) + c2[2] * mix,
 ];
 
-const toTwoDigitNumber = (num) => num < 10 && num >= 0
-  ? '0' + num.toFixed(0)
-  : num.toFixed(0);
+const toTwoDigitNumber = (num) => num < 10 && num >= 0 ?
+  '0' + num.toFixed(0) :
+  num.toFixed(0);
 
 /**
  * Wandelt eine Zahl in den entsprechenden Hexwert um für CSS-Farben
@@ -50,14 +50,14 @@ function parseWeatherData(json) {
   weatherCardVue.weathercode = json.weather[0].id;
   weatherCardVue.clouds = json.clouds.all;
   const color = mixColor(
-      [255, 170, 170],
-      [170, 170, 255],
-      ((json.main.temp - 273.15 - (json.main.temp_min - 273.15)) /
+    [255, 170, 170],
+    [170, 170, 255],
+    ((json.main.temp - 273.15 - (json.main.temp_min - 273.15)) /
       (json.main.temp_min - 273.15))
   );
   document.documentElement.style.setProperty(
-      '--current-temp-color',
-      '#' + rgbToHex(color[0]) + rgbToHex(color[1]) + rgbToHex(color[2])
+    '--current-temp-color',
+    '#' + rgbToHex(color[0]) + rgbToHex(color[1]) + rgbToHex(color[2])
   );
 }
 
@@ -101,6 +101,23 @@ const vvsCardVue = new Vue({
     vvscontent: '',
   },
 });
+
+const mastodonCardVue = new Vue({
+  el: '#mastodonCard',
+  data: {
+    title: 'Your Mastodon-Feed',
+    mastodoncontent: '',
+  },
+  methods: {
+    getMastodonLogin: function() {
+      const mInstance = document.getElementById('mastodonInstance').value;
+      if (title !== '') {
+        doMastodonAuth(mInstance);
+      }
+    }
+  }
+});
+
 
 const weatherCardVue = new Vue({
   el: '#weatherCard',
@@ -154,26 +171,26 @@ const weatherForecastCardVue = new Vue({
 function getOWMData() {
   fetch(
       'https://api.openweathermap.org/data/2.5/weather?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
-  )
-      .then((res) => {
-        return res.json();
-      })
-      .then((json) => {
-        parseWeatherData(json);
-      });
+    )
+    .then((res) => {
+      return res.json();
+    })
+    .then((json) => {
+      parseWeatherData(json);
+    });
   navigator.geolocation.getCurrentPosition((data) => {
     fetch(
         'https://api.openweathermap.org/data/2.5/weather?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' +
         data.coords.longitude +
         '&lat=' +
         data.coords.latitude
-    )
-        .then((res) => {
-          return res.json();
-        })
-        .then((json) => {
-          parseWeatherData(json);
-        });
+      )
+      .then((res) => {
+        return res.json();
+      })
+      .then((json) => {
+        parseWeatherData(json);
+      });
   });
 }
 getOWMData();
@@ -184,18 +201,20 @@ getOWMData();
  */
 function textToSpeech(str) {
   fetch('/getTTS', {
-    method: 'POST',
-    body: JSON.stringify({text: str}),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-      .then((res) => res.blob())
-      .then((blob) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(blob);
-        reader.onloadend = () => new Audio(reader.result).play();
-      });
+      method: 'POST',
+      body: JSON.stringify({
+        text: str
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then((res) => res.blob())
+    .then((blob) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(blob);
+      reader.onloadend = () => new Audio(reader.result).play();
+    });
 }
 
 /**
@@ -204,17 +223,17 @@ function textToSpeech(str) {
  */
 function getWikipediaSummary(title) {
   fetch('https://de.wikipedia.org/api/rest_v1/page/summary/' + title)
-      .then((res) => {
-        ttsCardVue.wikidata = 'Artikel wird geladen...';
-        return res.json();
-      })
-      .then(
-          (json) =>
-            (ttsCardVue.wikitext =
-            'extract' in json
-            ? json.extract
-            : 'Der Artikel konnte nicht gefunden werden.')
-      );
+    .then((res) => {
+      ttsCardVue.wikidata = 'Artikel wird geladen...';
+      return res.json();
+    })
+    .then(
+      (json) =>
+      (ttsCardVue.wikitext =
+        'extract' in json ?
+        json.extract :
+        'Der Artikel konnte nicht gefunden werden.')
+    );
 }
 
 /**
@@ -232,72 +251,73 @@ function wikipediaAutocomplete(title) {
   const url =
     'https://de.wikipedia.org/w/api.php?action=opensearch&namespace=0&format=json&search=' + encodeURIComponent(title);
   fetch('/getFile', {
-    method: 'POST',
-    body: JSON.stringify({url: url}),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-      .then((res) => res.json())
-      .then((json) => {
-        const datalist = document.getElementById('wikiAutocompleteList');
-        datalist.innerHTML = '';
-        json[1].forEach((item) => {
-          const option = document.createElement('option');
-          option.value = item;
-          datalist.appendChild(option);
-        });
+      method: 'POST',
+      body: JSON.stringify({
+        url: url
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then((res) => res.json())
+    .then((json) => {
+      const datalist = document.getElementById('wikiAutocompleteList');
+      datalist.innerHTML = '';
+      json[1].forEach((item) => {
+        const option = document.createElement('option');
+        option.value = item;
+        datalist.appendChild(option);
       });
+    });
 }
 
 const forecastChart = new Chart(
-    document.getElementById('weatherForecastChart'), {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [
-          {
-            label: 'Forecast (Minimum)',
-            data: [],
-            backgroundColor: 'rgba(34, 12, 169, 0.3)',
-            borderColor: 'rgba(34, 12, 169, 1)',
-            borderWidth: 1,
-          },
-          {
-            label: 'Forecast (Maximum)',
-            data: [],
-            backgroundColor: 'rgba(169, 12, 34, 0.3)',
-            borderColor: 'rgba(169, 12, 34, 1)',
-            borderWidth: 1,
-          },
-        ],
-      },
-    });
+  document.getElementById('weatherForecastChart'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+          label: 'Forecast (Minimum)',
+          data: [],
+          backgroundColor: 'rgba(34, 12, 169, 0.3)',
+          borderColor: 'rgba(34, 12, 169, 1)',
+          borderWidth: 1,
+        },
+        {
+          label: 'Forecast (Maximum)',
+          data: [],
+          backgroundColor: 'rgba(169, 12, 34, 0.3)',
+          borderColor: 'rgba(169, 12, 34, 1)',
+          borderWidth: 1,
+        },
+      ],
+    },
+  });
 
 /**
-* Parses the data for the weather forecast
-* @param {object} json The data for the weather forecast
-*/
+ * Parses the data for the weather forecast
+ * @param {object} json The data for the weather forecast
+ */
 function parseWeatherForecast(json) {
   weatherForecastCardVue.title =
     'Forecast for ' + json.city.name;
   json.list.forEach((item) =>
     forecastChart.data.labels.push(
-        new Date(item.dt_txt).toLocaleDateString('de-DE', {
-          weekday: 'short',
-          hour: '2-digit',
-          minute: '2-digit',
-        })
+      new Date(item.dt_txt).toLocaleDateString('de-DE', {
+        weekday: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      })
     )
   );
   json.list.forEach((item) =>
     forecastChart.data.datasets[0].data.push(
-        (item.main.temp_min - 273.15).toFixed(1)
+      (item.main.temp_min - 273.15).toFixed(1)
     )
   );
   json.list.forEach((item) =>
     forecastChart.data.datasets[1].data.push(
-        (item.main.temp_max - 273.15).toFixed(1)
+      (item.main.temp_max - 273.15).toFixed(1)
     )
   );
   forecastChart.update();
@@ -309,22 +329,22 @@ function parseWeatherForecast(json) {
 function getOWMForecast() {
   fetch(
       'https://api.openweathermap.org/data/2.5/forecast?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
-  )
-      .then((res) => {
-        return res.json();
-      })
-      .then((json) => parseWeatherForecast(json));
+    )
+    .then((res) => {
+      return res.json();
+    })
+    .then((json) => parseWeatherForecast(json));
   navigator.geolocation.getCurrentPosition((data) =>
     fetch(
-        'https://api.openweathermap.org/data/2.5/forecast?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' +
-        data.coords.longitude +
-        '&lat=' +
-        data.coords.latitude
+      'https://api.openweathermap.org/data/2.5/forecast?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' +
+      data.coords.longitude +
+      '&lat=' +
+      data.coords.latitude
     )
-        .then((res) => {
-          return res.json();
-        })
-        .then((json) => parseWeatherForecast(json))
+    .then((res) => {
+      return res.json();
+    })
+    .then((json) => parseWeatherForecast(json))
   );
 }
 
@@ -336,7 +356,9 @@ getOWMForecast();
 function getVVSData() {
   fetch('/getFile', {
     method: 'POST',
-    body: JSON.stringify({url: 'https://www2.vvs.de/oeffi/XSLT_DM_REQUEST?outputFormat=JSON&language=de&stateless=1&type_dm=stop&name_dm=5006056&useRealtime=1&mode=direct&ptOptionsActive=1&deleteAssignedStops_dm=1&useProxFootSearch=0&mergeDep=1&limit=12&itdTime=' + toTwoDigitNumber((new Date()).getHours()) + toTwoDigitNumber((new Date()).getMinutes())}),
+    body: JSON.stringify({
+      url: 'https://www2.vvs.de/oeffi/XSLT_DM_REQUEST?outputFormat=JSON&language=de&stateless=1&type_dm=stop&name_dm=5006056&useRealtime=1&mode=direct&ptOptionsActive=1&deleteAssignedStops_dm=1&useProxFootSearch=0&mergeDep=1&limit=12&itdTime=' + toTwoDigitNumber((new Date()).getHours()) + toTwoDigitNumber((new Date()).getMinutes())
+    }),
     headers: {
       'Content-Type': 'application/json',
     },
@@ -374,13 +396,44 @@ function getVVSData() {
   });
 }
 
+function initMastodon() {
+  // ToDo: Check Cookie
+
+  // ToDo: Check Valid session
+
+  // ToDo: Check if code is available
+  mastodonCardVue.mastodoncontent = `
+  <div>
+      <input type="text" id="mastodonInstance" placeholder="Your instance (e.g. mastodon.social)">
+      <button type="button" id="mastodonLoginClick" @click="mastodonLogin">Search</button>
+  </div>`;
+}
+
+function doMastodonAuth(mInstance) {
+  fetch('/mastodon/' + mInstance + '/oauth', {
+    method: 'GET'
+  }).then((res) => res.json()).then((json) => {
+    if (!json.client_id) {
+      throw "No client_id";
+    }
+    if (!json.success) {
+      throw "Server Side Problem";
+    }
+    window.location.replace("https://" + mInstance + "/oauth/authorize?scope=read&response_type=code&redirect_uri=https://dashboard.tinf17.in&client_id=" + json.client_id);
+  }).catch((e) => {
+    mastodonCardVue.mastodoncontent = `
+      Login failed.
+    `;
+
+  });
+}
 setInterval(() => {
   getVVSData();
   getRSSFeed();
 }, 60 * 1000);
 getVVSData();
 getRSSFeed();
-
+initMastodon();
 document.querySelector('.lightdarkswitch').onclick = () => {
   document.querySelector('html').classList.toggle('dark');
   document.querySelector('.lightdarkswitch').classList.toggle('wi-day-sunny');
