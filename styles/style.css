@@ -1,6 +1,8 @@
 @import "weatherCard.css";
 @import "vvsCard.css";
 @import "rssCard.css";
+@import "MastodonCard.css";
+
 
 html {
     --header-text-color: white;

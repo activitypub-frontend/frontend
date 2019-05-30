@@ -1,0 +1,13 @@
+.mStatus {
+  margin: 10px;
+  background-color: light-blue;
+}
+
+.mAuthorUser {
+  font-size: 8pt;
+  color: grey;
+}
+
+.mCreated {
+  float: right;
+}
