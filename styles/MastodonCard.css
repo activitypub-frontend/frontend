@@ -35,6 +35,7 @@
 .mAuthorImgBox {
   max-height: 40px;
   margin-right: 2px;
+  float: left;
 }
 .mAuthorImg {
   max-height: 40px;

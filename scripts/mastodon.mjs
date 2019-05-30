@@ -96,10 +96,10 @@ function mContent() {
 function mRenderStatus(s) {
   let htmlStatus = "<div class='mStatus' id='" + s.id + "'>";
   // From
-  htmlStatus += "<span class='mAuthorImgBox'><a href='"+s.account.url+"'' target='_blank' class='mAuthorImgLink'><img src='" + s.account.avatar + "' class='mAuthorImg'></a></span>";
+  htmlStatus += "<p class='mStatusPrefix'><span class='mAuthorImgBox'><a href='"+s.account.url+"'' target='_blank' class='mAuthorImgLink'><img src='" + s.account.avatar + "' class='mAuthorImg'></a></span>";
   htmlStatus += "<span class='mAuthor'><a href='"+s.account.url+"'' target='_blank' class='mAuthorLink'>" + s.account.display_name + "</a><br>";
   htmlStatus += "<a class='mAuthorUser mAuthorLink' href='"+s.account.url+"'' target='_blank'>@" + s.account.username + "</a></span>";
-  htmlStatus += "<span class='mCreated'>" + formatDate(new Date(s.created_at)) + "</span>";
+  htmlStatus += "<span class='mCreated'>" + formatDate(new Date(s.created_at)) + "</span></p>";
   htmlStatus += "<p class='mContent'>" + s.content + "</p>";
   if(s.media_attachments[0] && s.media_attachments[0].type === "image") {
     htmlStatus += "<a href='"+s.media_attachments[0].text_url+"' target='_blank'><img src='"+s.media_attachments[0].preview_url+"' class='mImg'></a>";
