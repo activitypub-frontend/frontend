@@ -47,18 +47,35 @@ function initMastodon() {
     mToken = getCookie('mToken');
     mInstance = getCookie('mInstance');
   }
-  // ToDo: Check Valid session
-
+  // Check Valid session
+  if (mAuth) {
+    fetch('https://' + mInstance + '/api/v1/accounts/verify_credentials', {
+      headers: {
+        "Authorization": "Bearer " + mToken
+      }
+    }).then((d) => {
+      console.log(d);
+      if (d.ok) {
+        mContent();
+      } else {
+        mAuth = false;
+        console.log(d);
+        mastodonCardVue.mastodoncontent = `
+      Error authenticating with Mastodon!
+    `;
+      }
+    }).catch((e) => {
+      console.log(e);
+      mAuth = false;
+    });
+  }
   mastodonCardVue.mastodoncontent = `
 `;
-  if (mAuth) {
-    document.getElementById('mLoginInstance').style.display = "none";
-    mContent();
-  }
 }
 
 function mContent() {
   if (mAuth) {
+    document.getElementById('mLoginInstance').style.display = "none";
     fetch('https://' + mInstance + '/api/v1/timelines/home', {
       headers: {
         "Authorization": "Bearer " + mToken
