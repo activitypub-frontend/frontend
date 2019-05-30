@@ -109,7 +109,7 @@ header > p {
     padding-bottom: 5px;
 }
 
-#ttsCard > .card-content, #rssCard > .card-content, #vvsCard > .card-content{
+#ttsCard > .card-content, #rssCard > .card-content, #vvsCard > .card-content, #mastodonCard > .card-content{
     overflow-y: auto;
     overflow-x: hidden;
     max-height: 83%;

@@ -95,9 +95,9 @@ function mContent() {
 function mRenderStatus(s) {
   let htmlStatus="<div class='mStatus' id='"+s.id+"'>";
   // From
-  htmlStatus+="<p class='mAuthor'>"+s.account.display_name+"</p>";
-  htmlStatus+="<p class='mAuthorUser'>"+s.account.username+"</p>";
-  htmlStatus+="<p class='mCreated'>"+s.created_at+"</p>";
+  htmlStatus+="<span class='mAuthor'>"+s.account.display_name+"</span>";
+  htmlStatus+="<span class='mAuthorUser'>@"+s.account.username+"</span>";
+  htmlStatus+="<span class='mCreated'>"+s.created_at+"</span>";
   htmlStatus+="<p class='mContent'>"+s.content+"</p>";
   htmlStatus+="</div>";
   return htmlStatus;
