@@ -84,24 +84,35 @@ function mContent() {
       return d.json();
     }).then((d) => {
       console.log(d);
-      for(let s in d) {
+      for (let s in d) {
         console.log(d[s]);
-        mastodonCardVue.mastodoncontent+=mRenderStatus(d[s]);
+        mastodonCardVue.mastodoncontent += mRenderStatus(d[s]);
       }
     });
 
   }
 }
+
 function mRenderStatus(s) {
-  let htmlStatus="<div class='mStatus' id='"+s.id+"'>";
+  let htmlStatus = "<div class='mStatus' id='" + s.id + "'>";
   // From
-  htmlStatus+="<span class='mAuthor'>"+s.account.display_name+"</span>";
-  htmlStatus+="<span class='mAuthorUser'>@"+s.account.username+"</span>";
-  htmlStatus+="<span class='mCreated'>"+s.created_at+"</span>";
-  htmlStatus+="<p class='mContent'>"+s.content+"</p>";
-  htmlStatus+="</div>";
+  htmlStatus += "<span class='mAuthor'>" + s.account.display_name + "</span>";
+  htmlStatus += "<span class='mAuthorUser'>@" + s.account.username + "</span>";
+  htmlStatus += "<span class='mCreated'>" + formatDate(new Date(s.created_at)) + "</span>";
+  htmlStatus += "<p class='mContent'>" + s.content + "</p>";
+  htmlStatus += "</div>";
   return htmlStatus;
 }
+
+function formatDate(date) {
+  var day = date.getDate();
+  var month = date.getMonth();
+  var hour = date.getHours();
+  var minute = date.getMinutes();
+
+  return day + ' ' + month + ' ' + hour + ':' + minute;
+}
+
 function doMastodonAuth(mInstance) {
   if (mInstance.length < 5) {
     mastodonCardVue.mastodoncontent = `
