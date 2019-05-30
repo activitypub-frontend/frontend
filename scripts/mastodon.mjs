@@ -9,8 +9,7 @@ const mastodonCardVue = new Vue({
   created: function() {
 
   },
-  methods: {
-  },
+  methods: {},
 });
 
 // Register event listeners for auth-button and enter
@@ -20,8 +19,8 @@ document.querySelector('#mastodonLoginClick').onclick = () => {
   doMastodonAuth(mInstance);
 };
 document.querySelector('#mastodonInstance').addEventListener("keyup", function(event) {
-    // 13 = enter
-   if (event.keyCode === 13) {
+  // 13 = enter
+  if (event.keyCode === 13) {
     event.preventDefault();
     // Trigger button click
     document.getElementById("mastodonLoginClick").click();
@@ -111,27 +110,27 @@ function mContent() {
 function mRenderStatus(s) {
   let htmlStatus = '<div class=\'mStatus\' id=\'' + s.id + '\'>';
   // Post header: author, image and date
-  htmlStatus += '<p class=\'mStatusPrefix\'><span class=\'mAuthorImgBox\'><a href=\''+s.account.url+'\'\' target=\'_blank\' class=\'mAuthorImgLink\'><img src=\'' + s.account.avatar + '\' class=\'mAuthorImg\'></a></span>';
-  htmlStatus += '<span class=\'mAuthor\'><a href=\''+s.account.url+'\'\' target=\'_blank\' class=\'mAuthorLink\'>' + s.account.display_name + '</a><br>';
-  htmlStatus += '<a class=\'mAuthorUser mAuthorLink\' href=\''+s.account.url+'\'\' target=\'_blank\'>@' + s.account.username + '</a></span>';
+  htmlStatus += '<p class=\'mStatusPrefix\'><span class=\'mAuthorImgBox\'><a href=\'' + s.account.url + '\'\' target=\'_blank\' class=\'mAuthorImgLink\'><img src=\'' + s.account.avatar + '\' class=\'mAuthorImg\'></a></span>';
+  htmlStatus += '<span class=\'mAuthor\'><a href=\'' + s.account.url + '\'\' target=\'_blank\' class=\'mAuthorLink\'>' + s.account.display_name + '</a><br>';
+  htmlStatus += '<a class=\'mAuthorUser mAuthorLink\' href=\'' + s.account.url + '\'\' target=\'_blank\'>@' + s.account.username + '</a></span>';
   htmlStatus += '<span class=\'mCreated\'>' + formatDate(new Date(s.created_at)) + '</span></p>';
   // Post content
   htmlStatus += '<p class=\'mContent\'>' + s.content + '</p>';
   // Image
-  if(s.media_attachments[0] && s.media_attachments[0].type === 'image') {
-    htmlStatus += '<a href=\''+s.media_attachments[0].text_url+'\' target=\'_blank\'><img src=\''+s.media_attachments[0].preview_url+'\' class=\'mImg\'></a>';
+  if (s.media_attachments[0] && s.media_attachments[0].type === 'image') {
+    htmlStatus += '<a href=\'' + s.media_attachments[0].text_url + '\' target=\'_blank\'><img src=\'' + s.media_attachments[0].preview_url + '\' class=\'mImg\'></a>';
   }
   // Link
-  htmlStatus += '<hr><a class=\'mLink\' target=\'_blank\' href=\''+s.url+'\'>View on Mastodon</a></div>';
+  htmlStatus += '<hr><a class=\'mLink\' target=\'_blank\' href=\'' + s.url + '\'>View on Mastodon</a></div>';
   return htmlStatus;
 }
 // Helper methods
 // builds date for display
 function formatDate(date) {
-  var day = '0'+date.getDate();
-  var month = '0'+date.getMonth();
-  var hour = '0'+date.getHours();
-  var minute = '0'+date.getMinutes();
+  var day = '0' + date.getDate();
+  var month = '0' + date.getMonth();
+  var hour = '0' + date.getHours();
+  var minute = '0' + date.getMinutes();
 
   return day.slice(-2) + '.' + month.slice(-2) + ' ' + hour.slice(-2) + ':' + minute.slice(-2);
 }
