@@ -49,6 +49,9 @@ function initMastodon() {
   // ToDo: Check if code is available
   mastodonCardVue.mastodoncontent = `
 `;
+if(mAuth) {
+  document.getElementById('mLoginInstance').style.display = "none";
+}
 }
 
 function mContent() {
