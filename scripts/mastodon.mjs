@@ -7,11 +7,16 @@ const mastodonCardVue = new Vue({
     title: 'Your Mastodon-Feed',
     mastodoncontent: '',
   },
-  created: function() {
-
-  },
-  methods: {},
 });
+
+/**
+ * Adds a trailing zero if number only has one digit.
+ * @param {number} num the number to convert
+ * @return {string} number with trailing zero if only has one digit
+ */
+const toTwoDigitNumber = (num) => num < 10 && num >= 0 ?
+  '0' + num.toFixed(0) :
+  num.toFixed(0);
 
 // Register event listeners for auth-button and enter
 document.querySelector('#mastodonLoginClick').onclick = () => {
@@ -19,6 +24,7 @@ document.querySelector('#mastodonLoginClick').onclick = () => {
   console.log('Auth with ' + mInstance);
   doMastodonAuth(mInstance);
 };
+
 document.querySelector('#mastodonInstance').addEventListener('keyup',
     function(event) {
       // 13 = enter
@@ -148,22 +154,16 @@ function mRenderStatus(s) {
     '\'>View on Mastodon</a></div>';
   return htmlStatus;
 }
-// Helper methods
-// builds date for display
+
 /**
  * builds date for display
  * @param {Date} date the date to format
  * @return {string} formatted date
  */
-function formatDate(date) {
-  const day = '0' + date.getDate();
-  const month = '0' + date.getMonth();
-  const hour = '0' + date.getHours();
-  const minute = '0' + date.getMinutes();
-
-  return day.slice(-2) + '.' + month.slice(-2) + ' ' + hour.slice(-2) + ':' +
-    minute.slice(-2);
-}
+const formatDate = (date) => toTwoDigitNumber(date.getDate())
+  + '.' + toTwoDigitNumber(date.getMonth() + 1)
+  + ' ' + toTwoDigitNumber(date.getHours())
+  + ':' + toTwoDigitNumber(date.getMinutes());
 
 /**
  * Does redirection to authentication page
@@ -179,25 +179,28 @@ function doMastodonAuth(mInstance) {
   // get client_id from backend
   fetch('/mastodon/' + mInstance + '/oauth', {
     method: 'GET',
-  }).then((res) => res.json()).then((json) => {
-    if (!json.client_id) {
-      throw new Error('No client_id');
-    }
-    if (!json.success) {
-      throw new Error('Server Side Problem');
-    }
-    setCookie('mInstance', mInstance, 30);
-    // redirect
-    window.location.replace('https://' + mInstance +
+  })
+      .then((res) => res.json())
+      .then((json) => {
+        if (!json.client_id) {
+          throw new Error('No client_id');
+        }
+        if (!json.success) {
+          throw new Error('Server Side Problem');
+        }
+        setCookie('mInstance', mInstance, 30);
+        // redirect
+        window.location.replace('https://' + mInstance +
       '/oauth/authorize?scope=read&response_type=code&' +
       'redirect_uri=https://dashboard.tinf17.in&client_id=' + json.client_id);
-  }).catch((e) => {
-    mastodonCardVue.mastodoncontent = `
+      })
+      .catch(() => {
+        mastodonCardVue.mastodoncontent = `
       Login failed.
     `;
-  });
+      });
 }
-// Cookie helper functions
+
 /**
  * Sets a cookie
  * @param {string} cname Cookie name

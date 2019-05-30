@@ -7,6 +7,7 @@
 import Vue from './vue.js';
 import Chart from './Chart.js';
 import rssFeed from './rssFeed.js';
+import './mastodon.mjs';
 
 /**
  * Mischt zwei Farben in einem Verhältnis,
@@ -213,7 +214,7 @@ function textToSpeech(str) {
 function getWikipediaSummary(title) {
   fetch('https://de.wikipedia.org/api/rest_v1/page/summary/' + title)
       .then((res) => {
-        ttsCardVue.wikidata = 'Artikel wird geladen...';
+        ttsCardVue.wikidata = 'Loading article...';
         return res.json();
       })
       .then(
@@ -221,7 +222,7 @@ function getWikipediaSummary(title) {
             (ttsCardVue.wikitext =
         'extract' in json ?
         json.extract :
-        'Der Artikel konnte nicht gefunden werden.')
+        'Article not found.')
       );
 }
 
