@@ -71,7 +71,8 @@
       <div class="card-content">
         <div id="mLoginInstance">
           <input type="text" id="mastodonInstance" v-on:keyup.enter="mastodonLoginClick" placeholder="Your instance (e.g. mastodon.social)">
-          <button type="button" id="mastodonLoginClick">Authenticate</button>
+          <button type="button" id="mastodonLoginClick">Authenticate</button><br>
+          <p>Please enter your Mastodon-Instance-URL (e.g. mastodon.social) to authenticate and view your timeline!</p>
         </div>
         <div id="mastodonCard-content" v-html="mastodoncontent">
         </div>
