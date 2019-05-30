@@ -85,13 +85,23 @@ function mContent() {
     }).then((d) => {
       console.log(d);
       for(let s in d) {
-        mastodonCardVue.mastodoncontent+=JSON.stringify(s);
+        console.log(s);
+        mastodonCardVue.mastodoncontent+=mRenderStatus(s);
       }
     });
 
   }
 }
-
+function mRenderStatus(s) {
+  htmlStatus="<div class='mStatus' id='"+s.id+"'>";
+  // From
+  htmlStatus+="<p class='mAuthor'>"+s.account.display_name+"</p>";
+  htmlStatus+="<p class='mAuthorUser'>"+s.account.username+"</p>";
+  htmlStatus+="<p class='mCreated'>"+s.created_at+"</p>";
+  htmlStatus+="<p class='mContent'>"+s.content+"</p>";
+  htmlStatus+="</div>";
+  return htmlStatus;
+}
 function doMastodonAuth(mInstance) {
   if (mInstance.length < 5) {
     mastodonCardVue.mastodoncontent = `
