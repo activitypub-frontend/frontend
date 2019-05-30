@@ -44,13 +44,11 @@ function initMastodon() {
   }
   if (getCookie('mInstance') && getCookie('mToken')) {
     mAuth = true;
-    mToken = urlParams.get('mCode');
+    mToken = getCookie('mToken');
     mInstance = getCookie('mInstance');
-
   }
   // ToDo: Check Valid session
 
-  // ToDo: Check if code is available
   mastodonCardVue.mastodoncontent = `
 `;
   if (mAuth) {
