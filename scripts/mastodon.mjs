@@ -10,17 +10,18 @@ const mastodonCardVue = new Vue({
 
   },
   methods: {
-    mastodonLogin: function(event) {
-
-      const mInstance = document.getElementById('mastodonInstance').value;
-      console.log("Auth with " + mInstance);
-      doMastodonAuth(mInstance);
-    },
     say: function(message) {
-      alert(message)
-    }
-  }
+      alert(message);
+    },
+  },
 });
+
+document.querySelector('#mastodonLoginClick').onclick = () => {
+  const mInstance = document.getElementById('mastodonInstance').value;
+  console.log('Auth with ' + mInstance);
+  doMastodonAuth(mInstance);
+};
+
 let mAuth = false;
 let mToken;
 let mInstance;
@@ -35,7 +36,7 @@ function initMastodon() {
       mToken = urlParams.get('mCode');
       mInstance = getCookie('mInstance');
       setCookie('mToken', mToken, 30);
-      console.log("Mastodon Auth Token: " + mToken);
+      console.log('Mastodon Auth Token: ' + mToken);
     } else {
       mastodonCardVue.mastodoncontent = `
       Server Side authentication Error happened.
@@ -51,8 +52,8 @@ function initMastodon() {
   if (mAuth) {
     fetch('https://' + mInstance + '/api/v1/accounts/verify_credentials', {
       headers: {
-        "Authorization": "Bearer " + mToken
-      }
+        'Authorization': 'Bearer ' + mToken,
+      },
     }).then((d) => {
       console.log(d);
       if (d.ok) {
@@ -75,11 +76,11 @@ function initMastodon() {
 
 function mContent() {
   if (mAuth) {
-    document.getElementById('mLoginInstance').style.display = "none";
+    document.getElementById('mLoginInstance').style.display = 'none';
     fetch('https://' + mInstance + '/api/v1/timelines/home', {
       headers: {
-        "Authorization": "Bearer " + mToken
-      }
+        'Authorization': 'Bearer ' + mToken,
+      },
     }).then((d) => {
       return d.json();
     }).then((d) => {
@@ -94,17 +95,17 @@ function mContent() {
 }
 
 function mRenderStatus(s) {
-  let htmlStatus = "<div class='mStatus' id='" + s.id + "'>";
+  let htmlStatus = '<div class=\'mStatus\' id=\'' + s.id + '\'>';
   // From
-  htmlStatus += "<p class='mStatusPrefix'><span class='mAuthorImgBox'><a href='"+s.account.url+"'' target='_blank' class='mAuthorImgLink'><img src='" + s.account.avatar + "' class='mAuthorImg'></a></span>";
-  htmlStatus += "<span class='mAuthor'><a href='"+s.account.url+"'' target='_blank' class='mAuthorLink'>" + s.account.display_name + "</a><br>";
-  htmlStatus += "<a class='mAuthorUser mAuthorLink' href='"+s.account.url+"'' target='_blank'>@" + s.account.username + "</a></span>";
-  htmlStatus += "<span class='mCreated'>" + formatDate(new Date(s.created_at)) + "</span></p>";
-  htmlStatus += "<p class='mContent'>" + s.content + "</p>";
-  if(s.media_attachments[0] && s.media_attachments[0].type === "image") {
-    htmlStatus += "<a href='"+s.media_attachments[0].text_url+"' target='_blank'><img src='"+s.media_attachments[0].preview_url+"' class='mImg'></a>";
+  htmlStatus += '<p class=\'mStatusPrefix\'><span class=\'mAuthorImgBox\'><a href=\''+s.account.url+'\'\' target=\'_blank\' class=\'mAuthorImgLink\'><img src=\'' + s.account.avatar + '\' class=\'mAuthorImg\'></a></span>';
+  htmlStatus += '<span class=\'mAuthor\'><a href=\''+s.account.url+'\'\' target=\'_blank\' class=\'mAuthorLink\'>' + s.account.display_name + '</a><br>';
+  htmlStatus += '<a class=\'mAuthorUser mAuthorLink\' href=\''+s.account.url+'\'\' target=\'_blank\'>@' + s.account.username + '</a></span>';
+  htmlStatus += '<span class=\'mCreated\'>' + formatDate(new Date(s.created_at)) + '</span></p>';
+  htmlStatus += '<p class=\'mContent\'>' + s.content + '</p>';
+  if(s.media_attachments[0] && s.media_attachments[0].type === 'image') {
+    htmlStatus += '<a href=\''+s.media_attachments[0].text_url+'\' target=\'_blank\'><img src=\''+s.media_attachments[0].preview_url+'\' class=\'mImg\'></a>';
   }
-  htmlStatus += "<hr><a class='mLink' target='_blank' href='"+s.url+"'>View on Mastodon</a></div>";
+  htmlStatus += '<hr><a class=\'mLink\' target=\'_blank\' href=\''+s.url+'\'>View on Mastodon</a></div>';
   return htmlStatus;
 }
 
@@ -125,16 +126,16 @@ function doMastodonAuth(mInstance) {
     return;
   }
   fetch('/mastodon/' + mInstance + '/oauth', {
-    method: 'GET'
+    method: 'GET',
   }).then((res) => res.json()).then((json) => {
     if (!json.client_id) {
-      throw "No client_id";
+      throw 'No client_id';
     }
     if (!json.success) {
-      throw "Server Side Problem";
+      throw 'Server Side Problem';
     }
     setCookie('mInstance', mInstance, 30);
-    window.location.replace("https://" + mInstance + "/oauth/authorize?scope=read&response_type=code&redirect_uri=https://dashboard.tinf17.in&client_id=" + json.client_id);
+    window.location.replace('https://' + mInstance + '/oauth/authorize?scope=read&response_type=code&redirect_uri=https://dashboard.tinf17.in&client_id=' + json.client_id);
   }).catch((e) => {
     mastodonCardVue.mastodoncontent = `
       Login failed.
@@ -146,12 +147,12 @@ function doMastodonAuth(mInstance) {
 function setCookie(cname, cvalue, exdays) {
   var d = new Date();
   d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-  var expires = "expires=" + d.toUTCString();
-  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+  var expires = 'expires=' + d.toUTCString();
+  document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/';
 }
 
 function getCookie(cname) {
-  var name = cname + "=";
+  var name = cname + '=';
   var decodedCookie = decodeURIComponent(document.cookie);
   var ca = decodedCookie.split(';');
   for (var i = 0; i < ca.length; i++) {
@@ -163,5 +164,5 @@ function getCookie(cname) {
       return c.substring(name.length, c.length);
     }
   }
-  return "";
+  return '';
 }

@@ -23,6 +23,11 @@ const mixColor = (c1, c2, mix) => [
   c1[2] * (1 - mix) + c2[2] * mix,
 ];
 
+/**
+ * Adds a trailing zero if number only has one digit.
+ * @param {number} num the number to convert
+ * @return {string} number with trailing zero if only has one digit
+ */
 const toTwoDigitNumber = (num) => num < 10 && num >= 0 ?
   '0' + num.toFixed(0) :
   num.toFixed(0);
@@ -50,14 +55,14 @@ function parseWeatherData(json) {
   weatherCardVue.weathercode = json.weather[0].id;
   weatherCardVue.clouds = json.clouds.all;
   const color = mixColor(
-    [255, 170, 170],
-    [170, 170, 255],
-    ((json.main.temp - 273.15 - (json.main.temp_min - 273.15)) /
+      [255, 170, 170],
+      [170, 170, 255],
+      ((json.main.temp - 273.15 - (json.main.temp_min - 273.15)) /
       (json.main.temp_min - 273.15))
   );
   document.documentElement.style.setProperty(
-    '--current-temp-color',
-    '#' + rgbToHex(color[0]) + rgbToHex(color[1]) + rgbToHex(color[2])
+      '--current-temp-color',
+      '#' + rgbToHex(color[0]) + rgbToHex(color[1]) + rgbToHex(color[2])
   );
 }
 
@@ -67,24 +72,25 @@ const ttsCardVue = new Vue({
     title: 'Text-to-Speech from Wikipedia',
     wikitext: 'Use the search to view any article.',
   },
-  methods: {
-    getWikipediaData: function() {
-      const title = document.getElementById('wikiSearchInput').value;
-      if (title !== '') {
-        getWikipediaSummary(title);
-      }
-    },
-    ReadExtract: function() {
-      textToSpeech(this.wikitext);
-    },
-    getWikiAutocomplete: function() {
-      const title = document.getElementById('wikiSearchInput').value;
-      if (title !== '') {
-        wikipediaAutocomplete(title);
-      }
-    },
-  },
 });
+
+document.querySelector('#wikiSearchInput').oninput = () => {
+  const title = document.getElementById('wikiSearchInput').value;
+  if (title !== '') {
+    wikipediaAutocomplete(title);
+  }
+};
+
+document.querySelector('#wikiSearchButton').onclick = () => {
+  const title = document.getElementById('wikiSearchInput').value;
+  if (title !== '') {
+    getWikipediaSummary(title);
+  }
+};
+
+document.querySelector('#readExtractButton').onclick = () => {
+  textToSpeech(document.querySelector('#wikitext').textContent);
+};
 
 const rssCardVue = new Vue({
   el: '#rssCard',
@@ -154,26 +160,26 @@ const weatherForecastCardVue = new Vue({
 function getOWMData() {
   fetch(
       'https://api.openweathermap.org/data/2.5/weather?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
-    )
-    .then((res) => {
-      return res.json();
-    })
-    .then((json) => {
-      parseWeatherData(json);
-    });
-  navigator.geolocation.getCurrentPosition((data) => {
-    fetch(
-        'https://api.openweathermap.org/data/2.5/weather?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' +
-        data.coords.longitude +
-        '&lat=' +
-        data.coords.latitude
-      )
+  )
       .then((res) => {
         return res.json();
       })
       .then((json) => {
         parseWeatherData(json);
       });
+  navigator.geolocation.getCurrentPosition((data) => {
+    fetch(
+        'https://api.openweathermap.org/data/2.5/weather?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' +
+        data.coords.longitude +
+        '&lat=' +
+        data.coords.latitude
+    )
+        .then((res) => {
+          return res.json();
+        })
+        .then((json) => {
+          parseWeatherData(json);
+        });
   });
 }
 getOWMData();
@@ -184,20 +190,20 @@ getOWMData();
  */
 function textToSpeech(str) {
   fetch('/getTTS', {
-      method: 'POST',
-      body: JSON.stringify({
-        text: str
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then((res) => res.blob())
-    .then((blob) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(blob);
-      reader.onloadend = () => new Audio(reader.result).play();
-    });
+    method: 'POST',
+    body: JSON.stringify({
+      text: str,
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+      .then((res) => res.blob())
+      .then((blob) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(blob);
+        reader.onloadend = () => new Audio(reader.result).play();
+      });
 }
 
 /**
@@ -206,17 +212,17 @@ function textToSpeech(str) {
  */
 function getWikipediaSummary(title) {
   fetch('https://de.wikipedia.org/api/rest_v1/page/summary/' + title)
-    .then((res) => {
-      ttsCardVue.wikidata = 'Artikel wird geladen...';
-      return res.json();
-    })
-    .then(
-      (json) =>
-      (ttsCardVue.wikitext =
+      .then((res) => {
+        ttsCardVue.wikidata = 'Artikel wird geladen...';
+        return res.json();
+      })
+      .then(
+          (json) =>
+            (ttsCardVue.wikitext =
         'extract' in json ?
         json.extract :
         'Der Artikel konnte nicht gefunden werden.')
-    );
+      );
 }
 
 /**
@@ -234,32 +240,32 @@ function wikipediaAutocomplete(title) {
   const url =
     'https://de.wikipedia.org/w/api.php?action=opensearch&namespace=0&format=json&search=' + encodeURIComponent(title);
   fetch('/getFile', {
-      method: 'POST',
-      body: JSON.stringify({
-        url: url
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then((res) => res.json())
-    .then((json) => {
-      const datalist = document.getElementById('wikiAutocompleteList');
-      datalist.innerHTML = '';
-      json[1].forEach((item) => {
-        const option = document.createElement('option');
-        option.value = item;
-        datalist.appendChild(option);
+    method: 'POST',
+    body: JSON.stringify({
+      url: url,
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+      .then((res) => res.json())
+      .then((json) => {
+        const datalist = document.getElementById('wikiAutocompleteList');
+        datalist.innerHTML = '';
+        json[1].forEach((item) => {
+          const option = document.createElement('option');
+          option.value = item;
+          datalist.appendChild(option);
+        });
       });
-    });
 }
 
 const forecastChart = new Chart(
-  document.getElementById('weatherForecastChart'), {
-    type: 'line',
-    data: {
-      labels: [],
-      datasets: [{
+    document.getElementById('weatherForecastChart'), {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [{
           label: 'Forecast (Minimum)',
           data: [],
           backgroundColor: 'rgba(34, 12, 169, 0.3)',
@@ -273,9 +279,9 @@ const forecastChart = new Chart(
           borderColor: 'rgba(169, 12, 34, 1)',
           borderWidth: 1,
         },
-      ],
-    },
-  });
+        ],
+      },
+    });
 
 /**
  * Parses the data for the weather forecast
@@ -286,21 +292,21 @@ function parseWeatherForecast(json) {
     'Forecast for ' + json.city.name;
   json.list.forEach((item) =>
     forecastChart.data.labels.push(
-      new Date(item.dt_txt).toLocaleDateString('de-DE', {
-        weekday: 'short',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
+        new Date(item.dt_txt).toLocaleDateString('de-DE', {
+          weekday: 'short',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
     )
   );
   json.list.forEach((item) =>
     forecastChart.data.datasets[0].data.push(
-      (item.main.temp_min - 273.15).toFixed(1)
+        (item.main.temp_min - 273.15).toFixed(1)
     )
   );
   json.list.forEach((item) =>
     forecastChart.data.datasets[1].data.push(
-      (item.main.temp_max - 273.15).toFixed(1)
+        (item.main.temp_max - 273.15).toFixed(1)
     )
   );
   forecastChart.update();
@@ -312,22 +318,22 @@ function parseWeatherForecast(json) {
 function getOWMForecast() {
   fetch(
       'https://api.openweathermap.org/data/2.5/forecast?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
-    )
-    .then((res) => {
-      return res.json();
-    })
-    .then((json) => parseWeatherForecast(json));
+  )
+      .then((res) => {
+        return res.json();
+      })
+      .then((json) => parseWeatherForecast(json));
   navigator.geolocation.getCurrentPosition((data) =>
     fetch(
-      'https://api.openweathermap.org/data/2.5/forecast?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' +
+        'https://api.openweathermap.org/data/2.5/forecast?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' +
       data.coords.longitude +
       '&lat=' +
       data.coords.latitude
     )
-    .then((res) => {
-      return res.json();
-    })
-    .then((json) => parseWeatherForecast(json))
+        .then((res) => {
+          return res.json();
+        })
+        .then((json) => parseWeatherForecast(json))
   );
 }
 
@@ -340,7 +346,7 @@ function getVVSData() {
   fetch('/getFile', {
     method: 'POST',
     body: JSON.stringify({
-      url: 'https://www2.vvs.de/oeffi/XSLT_DM_REQUEST?outputFormat=JSON&language=de&stateless=1&type_dm=stop&name_dm=5006056&useRealtime=1&mode=direct&ptOptionsActive=1&deleteAssignedStops_dm=1&useProxFootSearch=0&mergeDep=1&limit=12&itdTime=' + toTwoDigitNumber((new Date()).getHours()) + toTwoDigitNumber((new Date()).getMinutes())
+      url: 'https://www2.vvs.de/oeffi/XSLT_DM_REQUEST?outputFormat=JSON&language=de&stateless=1&type_dm=stop&name_dm=5006056&useRealtime=1&mode=direct&ptOptionsActive=1&deleteAssignedStops_dm=1&useProxFootSearch=0&mergeDep=1&limit=12&itdTime=' + toTwoDigitNumber((new Date()).getHours()) + toTwoDigitNumber((new Date()).getMinutes()),
     }),
     headers: {
       'Content-Type': 'application/json',
@@ -348,8 +354,16 @@ function getVVSData() {
   }).then((res) => res.json()).then((json) => {
     const div = document.createElement('div');
     json.departureList.forEach((el) => {
-      const realTime = new Date(el.realDateTime.year, el.realDateTime.month - 1, el.realDateTime.day, el.realDateTime.hour, el.realDateTime.minute);
-      const expectedTime = new Date(el.dateTime.year, el.dateTime.month - 1, el.dateTime.day, el.dateTime.hour, el.dateTime.minute);
+      const realTime = new Date(el.realDateTime.year,
+          el.realDateTime.month - 1,
+          el.realDateTime.day,
+          el.realDateTime.hour,
+          el.realDateTime.minute);
+      const expectedTime = new Date(el.dateTime.year,
+          el.dateTime.month - 1,
+          el.dateTime.day,
+          el.dateTime.hour,
+          el.dateTime.minute);
       const delay = realTime > expectedTime;
       const row = document.createElement('article');
       const lineBadge = document.createElement('span');
@@ -379,6 +393,9 @@ function getVVSData() {
   });
 }
 
+/**
+ * Updates the VVS and RSS every minute
+ */
 setInterval(() => {
   getVVSData();
   getRSSFeed();
@@ -386,6 +403,9 @@ setInterval(() => {
 getVVSData();
 getRSSFeed();
 
+/**
+ * Switches between light and dark mode
+ */
 document.querySelector('.lightdarkswitch').onclick = () => {
   document.querySelector('html').classList.toggle('dark');
   document.querySelector('.lightdarkswitch').classList.toggle('wi-day-sunny');

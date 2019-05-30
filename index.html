@@ -45,12 +45,12 @@
     <card id="ttsCard" class="content-card">
       <header>{{ title }}</header>
       <div>
-        <input @input="getWikiAutocomplete" type="text" id="wikiSearchInput" list="wikiAutocompleteList" placeholder="Load article...">
-        <button type="button" id="wikiSearchButton" @click="getWikipediaData">Search</button>
+        <input type="text" id="wikiSearchInput" list="wikiAutocompleteList" placeholder="Load article...">
+        <button type="button" id="wikiSearchButton">Search</button>
       </div>
       <datalist id="wikiAutocompleteList"></datalist>
-      <p>{{ wikitext }}</p>
-      <button type="button" @click="ReadExtract">Read aloud</button>
+      <p id="wikitext">{{ wikitext }}</p>
+      <button type="button" id="readExtractButton">Read aloud</button>
     </card>
     <card id="rssCard" class="content-card">
       <header>{{ title }}</header>
@@ -68,7 +68,7 @@
       <header>{{ title }}</header>
       <div id="mLoginInstance">
         <input type="text" id="mastodonInstance" placeholder="Your instance (e.g. mastodon.social)">
-        <button type="button" id="mastodonLoginClick" v-on:click="mastodonLogin">Authenticate</button>
+        <button type="button" id="mastodonLoginClick">Authenticate</button>
       </div>
       <div id="mastodonCard-content" class="card-content" v-html="mastodoncontent">
       </div>
