@@ -14,3 +14,10 @@
   float: right;
   font-size: 10pt;
 }
+.mAuthorLink {
+  color: grey;
+
+}
+.mAuthorLink:hover {
+  text-decoration: none;
+}
