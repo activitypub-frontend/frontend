@@ -1,14 +1,16 @@
 .mStatus {
   margin: 10px;
   background-color: var(--content-background);
-  padding: 10px;
+  padding: 5px;
 }
 
 .mAuthorUser {
   font-size: 8pt;
   color: grey;
+  margin-left: 5px;
 }
 
 .mCreated {
   float: right;
+  font-size: 10pt;
 }

@@ -96,10 +96,13 @@ function mContent() {
 function mRenderStatus(s) {
   let htmlStatus = "<div class='mStatus' id='" + s.id + "'>";
   // From
-  htmlStatus += "<span class='mAuthor'>" + s.account.display_name + "</span>";
-  htmlStatus += "<span class='mAuthorUser'>@" + s.account.username + "</span>";
+  htmlStatus += "<span class='mAuthor'><a href='"+s.account.url+"'' target='_blank'>" + s.account.display_name + "</a></span>";
+  htmlStatus += "<span class='mAuthorUser'><a href='"+s.account.url+"'' target='_blank'>@" + s.account.username + "</a></span>";
   htmlStatus += "<span class='mCreated'>" + formatDate(new Date(s.created_at)) + "</span>";
   htmlStatus += "<p class='mContent'>" + s.content + "</p>";
+  if(s.media_attachments[0] && s.media_attachments[0].type === "image") {
+    htmlStatus += "<a img='"+s.media_attachments[0].text_url+"' target='_blank'><img src='"+s.media_attachments[0].preview_url+"' class='mImage'></a>";
+  }
   htmlStatus += "</div>";
   return htmlStatus;
 }
