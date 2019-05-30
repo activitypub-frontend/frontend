@@ -1,6 +1,7 @@
 .mStatus {
   margin: 10px;
-  background-color: light-blue;
+  background-color: var(--content-background);
+  padding: 10px;
 }
 
 .mAuthorUser {

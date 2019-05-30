@@ -105,12 +105,12 @@ function mRenderStatus(s) {
 }
 
 function formatDate(date) {
-  var day = date.getDate();
-  var month = date.getMonth();
-  var hour = date.getHours();
-  var minute = date.getMinutes();
+  var day = '0'+date.getDate();
+  var month = '0'+date.getMonth();
+  var hour = '0'+date.getHours();
+  var minute = '0'+date.getMinutes();
 
-  return day + ' ' + month + ' ' + hour + ':' + minute;
+  return day.slice(-2) + '.' + month.slice(-2) + ' ' + hour.slice(-2) + ':' + minute.slice(-2);
 }
 
 function doMastodonAuth(mInstance) {
