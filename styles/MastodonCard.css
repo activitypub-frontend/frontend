@@ -29,3 +29,10 @@
 .mImg {
   max-width: 100%;
 }
+.mAuthorImgBox {
+  max-height: 40px;
+}
+.mAuthorImg {
+  max-height: 100%;
+  max-width: 100%;
+}
