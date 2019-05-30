@@ -117,10 +117,13 @@ function mRenderStatus(s) {
   htmlStatus += '<p class=\'mContent\'>' + s.content + '</p>';
   // Image
   if (s.media_attachments[0] && s.media_attachments[0].type === 'image') {
-    htmlStatus += '<a href=\'' + s.media_attachments[0].text_url + '\' target=\'_blank\'><img src=\'' + s.media_attachments[0].preview_url + '\' class=\'mImg\'></a>';
+    htmlStatus += '<a href=\'' + s.media_attachments[0].text_url +
+      '\' target=\'_blank\'><img src=\'' + s.media_attachments[0].preview_url +
+      '\' class=\'mImg\'></a>';
   }
   // Link
-  htmlStatus += '<hr><a class=\'mLink\' target=\'_blank\' href=\'' + s.url + '\'>View on Mastodon</a></div>';
+  htmlStatus += '<hr><a class=\'mLink\' target=\'_blank\' href=\'' + s.url +
+    '\'>View on Mastodon</a></div>';
   return htmlStatus;
 }
 // Helper methods
@@ -131,7 +134,8 @@ function formatDate(date) {
   const hour = '0' + date.getHours();
   const minute = '0' + date.getMinutes();
 
-  return day.slice(-2) + '.' + month.slice(-2) + ' ' + hour.slice(-2) + ':' + minute.slice(-2);
+  return day.slice(-2) + '.' + month.slice(-2) + ' ' + hour.slice(-2) + ':' +
+    minute.slice(-2);
 }
 
 // Does redirection to authentication page
@@ -147,14 +151,16 @@ function doMastodonAuth(mInstance) {
     method: 'GET',
   }).then((res) => res.json()).then((json) => {
     if (!json.client_id) {
-      throw 'No client_id';
+      throw new Error('No client_id');
     }
     if (!json.success) {
-      throw 'Server Side Problem';
+      throw new Error('Server Side Problem');
     }
     setCookie('mInstance', mInstance, 30);
     // redirect
-    window.location.replace('https://' + mInstance + '/oauth/authorize?scope=read&response_type=code&redirect_uri=https://dashboard.tinf17.in&client_id=' + json.client_id);
+    window.location.replace('https://' + mInstance +
+      '/oauth/authorize?scope=read&response_type=code&' +
+      'redirect_uri=https://dashboard.tinf17.in&client_id=' + json.client_id);
   }).catch((e) => {
     mastodonCardVue.mastodoncontent = `
       Login failed.
