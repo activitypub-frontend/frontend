@@ -18,12 +18,12 @@ document.querySelector('#mastodonLoginClick').onclick = () => {
   console.log('Auth with ' + mInstance);
   doMastodonAuth(mInstance);
 };
-document.querySelector('#mastodonInstance').addEventListener("keyup", function(event) {
+document.querySelector('#mastodonInstance').addEventListener('keyup', function(event) {
   // 13 = enter
   if (event.keyCode === 13) {
     event.preventDefault();
     // Trigger button click
-    document.getElementById("mastodonLoginClick").click();
+    document.getElementById('mastodonLoginClick').click();
   }
 });
 
@@ -98,12 +98,11 @@ function mContent() {
     }).then((d) => {
       return d.json();
     }).then((d) => {
-      for (let s in d) {
+      for (const s in d) {
         // Build HTML for each post
         mastodonCardVue.mastodoncontent += mRenderStatus(d[s]);
       }
     });
-
   }
 }
 
@@ -127,10 +126,10 @@ function mRenderStatus(s) {
 // Helper methods
 // builds date for display
 function formatDate(date) {
-  var day = '0' + date.getDate();
-  var month = '0' + date.getMonth();
-  var hour = '0' + date.getHours();
-  var minute = '0' + date.getMinutes();
+  const day = '0' + date.getDate();
+  const month = '0' + date.getMonth();
+  const hour = '0' + date.getHours();
+  const minute = '0' + date.getMinutes();
 
   return day.slice(-2) + '.' + month.slice(-2) + ' ' + hour.slice(-2) + ':' + minute.slice(-2);
 }
@@ -160,23 +159,22 @@ function doMastodonAuth(mInstance) {
     mastodonCardVue.mastodoncontent = `
       Login failed.
     `;
-
   });
 }
 // Cookie helper functions
 function setCookie(cname, cvalue, exdays) {
-  var d = new Date();
+  const d = new Date();
   d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-  var expires = 'expires=' + d.toUTCString();
+  const expires = 'expires=' + d.toUTCString();
   document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/';
 }
 
 function getCookie(cname) {
-  var name = cname + '=';
-  var decodedCookie = decodeURIComponent(document.cookie);
-  var ca = decodedCookie.split(';');
-  for (var i = 0; i < ca.length; i++) {
-    var c = ca[i];
+  const name = cname + '=';
+  const decodedCookie = decodeURIComponent(document.cookie);
+  const ca = decodedCookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
     while (c.charAt(0) == ' ') {
       c = c.substring(1);
     }
