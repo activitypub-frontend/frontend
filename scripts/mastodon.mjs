@@ -36,22 +36,27 @@ function initMastodon() {
       mInstance = getCookie('mInstance');
       setCookie('mToken', mToken, 30);
       console.log("Mastodon Auth Token: " + mToken);
-      mContent();
     } else {
       mastodonCardVue.mastodoncontent = `
       Server Side authentication Error happened.
     `;
     }
   }
+  if (getCookie('mInstance') && getCookie('mToken')) {
+    mAuth = true;
+    mToken = urlParams.get('mCode');
+    mInstance = getCookie('mInstance');
 
+  }
   // ToDo: Check Valid session
 
   // ToDo: Check if code is available
   mastodonCardVue.mastodoncontent = `
 `;
-if(mAuth) {
-  document.getElementById('mLoginInstance').style.display = "none";
-}
+  if (mAuth) {
+    document.getElementById('mLoginInstance').style.display = "none";
+    mContent();
+  }
 }
 
 function mContent() {
