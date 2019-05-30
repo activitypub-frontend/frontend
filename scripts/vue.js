@@ -1730,9 +1730,8 @@ function flushCallbacks() {
 // completely stops working after triggering a few times... so, if native
 // Promise is available, we will use it:
 /* istanbul ignore next, $flow-disable-line */
-const p = Promise.resolve();
 const timerFunc = () => {
-  p.then(flushCallbacks);
+  Promise.resolve().then(flushCallbacks);
   // In problematic UIWebViews, Promise.then doesn't completely break, but
   // it can get stuck in a weird state where callbacks are pushed into the
   // microtask queue but the queue isn't being flushed, until the browser
@@ -1767,29 +1766,14 @@ function nextTick(cb, ctx) {
 }
 
 /*  */
-
-let mark;
-let measure;
-
-{
-  const perf = window.performance;
-  /* istanbul ignore if */
-  if (
-    perf &&
-    perf.mark &&
-    perf.measure &&
-    perf.clearMarks &&
-    perf.clearMeasures
-  ) {
-    mark = (tag) => perf.mark(tag);
-    measure = (name, startTag, endTag) => {
-      perf.measure(name, startTag, endTag);
-      perf.clearMarks(startTag);
-      perf.clearMarks(endTag);
-      // perf.clearMeasures(name)
-    };
-  }
-}
+const perf = window.performance;
+const mark = (tag) => perf.mark(tag);
+const measure = (name, startTag, endTag) => {
+  perf.measure(name, startTag, endTag);
+  perf.clearMarks(startTag);
+  perf.clearMarks(endTag);
+  // perf.clearMeasures(name)
+};
 
 /* not type checking this file because flow doesn't play well with Proxy */
 
@@ -4714,6 +4698,10 @@ class Vue {
     }
     installedPlugins.push(plugin);
     return this;
+  }
+
+  static get __patch__() {
+    return patch;
   }
 
   mixin(mixin) {
@@ -8713,10 +8701,6 @@ Vue.config.isUnknownElement = isUnknownElement;
 // install platform runtime directives & components
 extend(Vue.options.directives, platformDirectives);
 extend(Vue.options.components, platformComponents);
-
-// install platform patch function
-Vue.prototype.__patch__ = patch;
-
 
 /*  */
 

@@ -162,12 +162,8 @@ function getOWMData() {
   fetch(
       'https://api.openweathermap.org/data/2.5/weather?q=Stuttgart,DE&APPID=5f867317a42e45aad8ac2fd5f92ddec3'
   )
-      .then((res) => {
-        return res.json();
-      })
-      .then((json) => {
-        parseWeatherData(json);
-      });
+      .then((res) => res.json())
+      .then((json) => parseWeatherData(json));
   navigator.geolocation.getCurrentPosition((data) => {
     fetch(
         'https://api.openweathermap.org/data/2.5/weather?APPID=5f867317a42e45aad8ac2fd5f92ddec3&lon=' +
@@ -175,12 +171,8 @@ function getOWMData() {
         '&lat=' +
         data.coords.latitude
     )
-        .then((res) => {
-          return res.json();
-        })
-        .then((json) => {
-          parseWeatherData(json);
-        });
+        .then((res) => res.json())
+        .then((json) => parseWeatherData(json));
   });
 }
 getOWMData();
