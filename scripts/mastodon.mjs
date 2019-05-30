@@ -1,3 +1,4 @@
+/* eslint-disable guard-for-in */
 // Everything related to the mastodon-instance
 // Init Vue-Object for data binding
 const mastodonCardVue = new Vue({
@@ -36,6 +37,9 @@ let mInstance;
 // Run initialization
 initMastodon();
 
+/**
+ * Initialize Mastodon
+ */
 function initMastodon() {
   // Check if querystring has the auth key (comes from backend)
   const urlParams = new URLSearchParams(window.location.search);
@@ -87,6 +91,9 @@ function initMastodon() {
 `;
 }
 
+/**
+ * Get Mastodon content
+ */
 function mContent() {
   if (mAuth) {
     // Remove the authentication/instance form
@@ -96,20 +103,20 @@ function mContent() {
       headers: {
         'Authorization': 'Bearer ' + mToken,
       },
-    }).then((d) => {
-      return d.json();
-    }).then((d) => {
-      for (const s in d) {
-        // Build HTML for each post
-        mastodonCardVue.mastodoncontent += mRenderStatus(d[s]);
-      }
-    });
+    }).then((d) => d.json())
+        .then((d) => {
+          for (const s in d) {
+            // Build HTML for each post
+            mastodonCardVue.mastodoncontent += mRenderStatus(d[s]);
+          }
+        });
   }
 }
 
 /**
- * 
- * @param s 
+ * Render status
+ * @param {object} s Status object
+ * @return {string} Rendered HTML
  */
 function mRenderStatus(s) {
   let htmlStatus = '<div class=\'mStatus\' id=\'' + s.id + '\'>';
@@ -129,7 +136,7 @@ function mRenderStatus(s) {
   </span>
   <span class="mCreated">${formatDate(new Date(s.created_at))}</span></p>`;
   // Post content
-  htmlStatus += '<p class=\'mContent\'>' + s.content + '</p>';
+  htmlStatus += '<p class="mContent">' + s.content + '</p>';
   // Image
   if (s.media_attachments[0] && s.media_attachments[0].type === 'image') {
     htmlStatus += '<a href=\'' + s.media_attachments[0].text_url +
