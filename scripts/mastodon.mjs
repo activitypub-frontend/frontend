@@ -109,10 +109,17 @@ function mContent() {
 function mRenderStatus(s) {
   let htmlStatus = '<div class=\'mStatus\' id=\'' + s.id + '\'>';
   // Post header: author, image and date
-  htmlStatus += '<p class=\'mStatusPrefix\'><span class=\'mAuthorImgBox\'><a href=\'' + s.account.url + '\'\' target=\'_blank\' class=\'mAuthorImgLink\'><img src=\'' + s.account.avatar + '\' class=\'mAuthorImg\'></a></span>';
-  htmlStatus += '<span class=\'mAuthor\'><a href=\'' + s.account.url + '\'\' target=\'_blank\' class=\'mAuthorLink\'>' + s.account.display_name + '</a><br>';
-  htmlStatus += '<a class=\'mAuthorUser mAuthorLink\' href=\'' + s.account.url + '\'\' target=\'_blank\'>@' + s.account.username + '</a></span>';
-  htmlStatus += '<span class=\'mCreated\'>' + formatDate(new Date(s.created_at)) + '</span></p>';
+  htmlStatus +=
+    '<p class=\'mStatusPrefix\'><span class=\'mAuthorImgBox\'><a href=\'' +
+    s.account.url + '\'\' target=\'_blank\' class=\'mAuthorImgLink\'><img src=\'' +
+    s.account.avatar + '\' class=\'mAuthorImg\'></a></span>';
+  htmlStatus += '<span class=\'mAuthor\'><a href=\'' + s.account.url +
+    '\'\' target=\'_blank\' class=\'mAuthorLink\'>' +
+    s.account.display_name + '</a><br>';
+  htmlStatus += '<a class=\'mAuthorUser mAuthorLink\' href=\'' + s.account.url +
+    '\'\' target=\'_blank\'>@' + s.account.username + '</a></span>';
+  htmlStatus += '<span class=\'mCreated\'>' +
+    formatDate(new Date(s.created_at)) + '</span></p>';
   // Post content
   htmlStatus += '<p class=\'mContent\'>' + s.content + '</p>';
   // Image
