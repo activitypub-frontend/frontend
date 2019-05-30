@@ -44,13 +44,15 @@
     </card>
     <card id="ttsCard" class="content-card">
       <header>{{ title }}</header>
-      <div>
-        <input type="text" id="wikiSearchInput" list="wikiAutocompleteList" placeholder="Load article...">
-        <button type="button" id="wikiSearchButton">Search</button>
+      <div class="card-content">
+        <div>
+          <input type="text" id="wikiSearchInput" list="wikiAutocompleteList" placeholder="Load article...">
+          <button type="button" id="wikiSearchButton">Search</button>
+        </div>
+        <datalist id="wikiAutocompleteList"></datalist>
+        <p id="wikitext">{{ wikitext }}</p>
+        <button type="button" id="readExtractButton">Read aloud</button>
       </div>
-      <datalist id="wikiAutocompleteList"></datalist>
-      <p id="wikitext">{{ wikitext }}</p>
-      <button type="button" id="readExtractButton">Read aloud</button>
     </card>
     <card id="rssCard" class="content-card">
       <header>{{ title }}</header>
@@ -66,11 +68,13 @@
     </card>
     <card id="mastodonCard" class="content-card">
       <header>{{ title }}</header>
-      <div id="mLoginInstance">
-        <input type="text" id="mastodonInstance" placeholder="Your instance (e.g. mastodon.social)">
-        <button type="button" id="mastodonLoginClick">Authenticate</button>
-      </div>
-      <div id="mastodonCard-content" class="card-content" v-html="mastodoncontent">
+      <div class="card-content">
+        <div id="mLoginInstance">
+          <input type="text" id="mastodonInstance" placeholder="Your instance (e.g. mastodon.social)">
+          <button type="button" id="mastodonLoginClick">Authenticate</button>
+        </div>
+        <div id="mastodonCard-content" v-html="mastodoncontent">
+        </div>
       </div>
     </card>
   </div>
