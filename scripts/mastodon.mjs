@@ -93,7 +93,7 @@ function mContent() {
   }
 }
 function mRenderStatus(s) {
-  htmlStatus="<div class='mStatus' id='"+s.id+"'>";
+  let htmlStatus="<div class='mStatus' id='"+s.id+"'>";
   // From
   htmlStatus+="<p class='mAuthor'>"+s.account.display_name+"</p>";
   htmlStatus+="<p class='mAuthorUser'>"+s.account.username+"</p>";
