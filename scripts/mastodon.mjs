@@ -85,8 +85,8 @@ function mContent() {
     }).then((d) => {
       console.log(d);
       for(let s in d) {
-        console.log(s);
-        mastodonCardVue.mastodoncontent+=mRenderStatus(s);
+        console.log(d[s]);
+        mastodonCardVue.mastodoncontent+=mRenderStatus(d[s]);
       }
     });
 
