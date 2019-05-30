@@ -25,6 +25,7 @@
 }
 .mLink {
   color: grey;
+  font-size: 10pt;
 }
 .mLink:hover {
   text-decoration: none;
@@ -39,4 +40,7 @@
 }
 .mAuthorImg {
   max-height: 40px;
+}
+.mStatusPrefix {
+  display: inline-block;
 }
