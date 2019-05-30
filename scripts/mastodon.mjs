@@ -29,7 +29,7 @@ function initMastodon() {
   // ToDo: Check Valid session
 
   // ToDo: Check if code is available
-mastodonCardVue.mastodoncontent = `
+  mastodonCardVue.mastodoncontent = `
 <div>
         <input type="text" id="mastodonInstance" placeholder="Your instance (e.g. mastodon.social)">
         <button type="button" id="mastodonLoginClick" v-on:click="mastodonLogin">Authenticate</button>
@@ -37,7 +37,7 @@ mastodonCardVue.mastodoncontent = `
 }
 
 function doMastodonAuth(mInstance) {
-  if(mInstance.length<5) {
+  if (mInstance.length < 5) {
     mastodonCardVue.mastodoncontent = `
       Invalid Instance.
     `;
