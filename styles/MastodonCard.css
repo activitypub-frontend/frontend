@@ -9,6 +9,9 @@
   color: grey;
   margin-left: 5px;
 }
+.mAuthor {
+  float: left;
+}
 
 .mCreated {
   float: right;
@@ -31,8 +34,8 @@
 }
 .mAuthorImgBox {
   max-height: 40px;
+  margin-right: 2px;
 }
 .mAuthorImg {
-  max-height: 100%;
-  max-width: 100%;
+  max-height: 40px;
 }
