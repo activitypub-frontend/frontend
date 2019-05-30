@@ -101,7 +101,7 @@ function mRenderStatus(s) {
   htmlStatus += "<span class='mCreated'>" + formatDate(new Date(s.created_at)) + "</span>";
   htmlStatus += "<p class='mContent'>" + s.content + "</p>";
   if(s.media_attachments[0] && s.media_attachments[0].type === "image") {
-    htmlStatus += "<a href='"+s.media_attachments[0].text_url+"' target='_blank'><img src='"+s.media_attachments[0].preview_url+"' class='mImage'></a>";
+    htmlStatus += "<a href='"+s.media_attachments[0].text_url+"' target='_blank'><img src='"+s.media_attachments[0].preview_url+"' class='mImg'></a>";
   }
   htmlStatus += "<hr><a class='mLink' target='_blank' href='"+s.url+"'>View on Mastodon</a></div>";
   return htmlStatus;

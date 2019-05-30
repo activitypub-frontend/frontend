@@ -14,10 +14,18 @@
   float: right;
   font-size: 10pt;
 }
-.mAuthorLink .mLink {
+.mAuthorLink {
   color: grey;
-
 }
-.mAuthorLink:hover .mLink {
+.mAuthorLink:hover {
   text-decoration: none;
+}
+.mLink {
+  color: grey;
+}
+.mLink:hover {
+  text-decoration: none;
+}
+.mImg {
+  max-width: 100%;
 }
