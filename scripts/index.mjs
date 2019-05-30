@@ -193,7 +193,6 @@ function textToSpeech(str) {
     method: 'POST',
     body: JSON.stringify({
       text: str,
-      voice: 'de-DE_DieterV2Voice'
     }),
     headers: {
       'Content-Type': 'application/json',
