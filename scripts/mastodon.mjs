@@ -21,6 +21,14 @@ document.querySelector('#mastodonLoginClick').onclick = () => {
   console.log('Auth with ' + mInstance);
   doMastodonAuth(mInstance);
 };
+document.querySelector('#mastodonInstance').addEventListener("keyup", function(event) {
+    // 13 = enter
+   if (event.keyCode === 13) {
+    event.preventDefault();
+    // Trigger button click
+    document.getElementById("mastodonLoginClick").click();
+  }
+});
 
 let mAuth = false;
 let mToken;
