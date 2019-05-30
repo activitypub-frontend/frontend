@@ -18,14 +18,15 @@ document.querySelector('#mastodonLoginClick').onclick = () => {
   console.log('Auth with ' + mInstance);
   doMastodonAuth(mInstance);
 };
-document.querySelector('#mastodonInstance').addEventListener('keyup', function(event) {
-  // 13 = enter
-  if (event.keyCode === 13) {
-    event.preventDefault();
-    // Trigger button click
-    document.getElementById('mastodonLoginClick').click();
-  }
-});
+document.querySelector('#mastodonInstance').addEventListener('keyup',
+    function(event) {
+      // 13 = enter
+      if (event.keyCode === 13) {
+        event.preventDefault();
+        // Trigger button click
+        document.getElementById('mastodonLoginClick').click();
+      }
+    });
 
 // Init variables for mastodon state, default to not authenticated
 let mAuth = false;
@@ -106,20 +107,27 @@ function mContent() {
   }
 }
 
+/**
+ * 
+ * @param s 
+ */
 function mRenderStatus(s) {
   let htmlStatus = '<div class=\'mStatus\' id=\'' + s.id + '\'>';
   // Post header: author, image and date
-  htmlStatus +=
-    '<p class=\'mStatusPrefix\'><span class=\'mAuthorImgBox\'><a href=\'' +
-    s.account.url + '\'\' target=\'_blank\' class=\'mAuthorImgLink\'><img src=\'' +
-    s.account.avatar + '\' class=\'mAuthorImg\'></a></span>';
-  htmlStatus += '<span class=\'mAuthor\'><a href=\'' + s.account.url +
-    '\'\' target=\'_blank\' class=\'mAuthorLink\'>' +
-    s.account.display_name + '</a><br>';
-  htmlStatus += '<a class=\'mAuthorUser mAuthorLink\' href=\'' + s.account.url +
-    '\'\' target=\'_blank\'>@' + s.account.username + '</a></span>';
-  htmlStatus += '<span class=\'mCreated\'>' +
-    formatDate(new Date(s.created_at)) + '</span></p>';
+  htmlStatus += `<p class="mStatusPrefix">
+  <span class="mAuthorImgBox">
+    <a href="${s.account.url}" target="_blank" class="mAuthorImgLink">
+      <img src="${s.account.avatar}" class="mAuthorImg">
+    </a>
+  </span>
+  <span class="mAuthor">
+    <a href="${s.account.url}" target="_blank" 
+    class="mAuthorLink">${s.account.display_name}</a>
+    <br>
+    <a class="mAuthorUser mAuthorLink" href="${s.account.url}" 
+    target="_blank">@${s.account.username}</a>
+  </span>
+  <span class="mCreated">${formatDate(new Date(s.created_at))}</span></p>`;
   // Post content
   htmlStatus += '<p class=\'mContent\'>' + s.content + '</p>';
   // Image
@@ -135,6 +143,11 @@ function mRenderStatus(s) {
 }
 // Helper methods
 // builds date for display
+/**
+ * builds date for display
+ * @param {Date} date the date to format
+ * @return {string} formatted date
+ */
 function formatDate(date) {
   const day = '0' + date.getDate();
   const month = '0' + date.getMonth();
@@ -145,7 +158,10 @@ function formatDate(date) {
     minute.slice(-2);
 }
 
-// Does redirection to authentication page
+/**
+ * Does redirection to authentication page
+ * @param {string} mInstance The Mastodon instance
+ */
 function doMastodonAuth(mInstance) {
   if (mInstance.length < 5) {
     mastodonCardVue.mastodoncontent = `
@@ -175,6 +191,12 @@ function doMastodonAuth(mInstance) {
   });
 }
 // Cookie helper functions
+/**
+ * Sets a cookie
+ * @param {string} cname Cookie name
+ * @param {string} cvalue Cookie value
+ * @param {number} exdays Expiration
+ */
 function setCookie(cname, cvalue, exdays) {
   const d = new Date();
   d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
@@ -182,6 +204,11 @@ function setCookie(cname, cvalue, exdays) {
   document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/';
 }
 
+/**
+ * Gets a cookie
+ * @param {string} cname Cookie name
+ * @return {string} Cookie value
+ */
 function getCookie(cname) {
   const name = cname + '=';
   const decodedCookie = decodeURIComponent(document.cookie);
