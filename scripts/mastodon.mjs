@@ -7,7 +7,7 @@ const mastodonCardVue = new Vue({
     mastodoncontent: '',
   },
   created: function() {
-    initMastodon();
+
   },
   methods: {
     mastodonLogin: function(event) {
@@ -21,7 +21,7 @@ const mastodonCardVue = new Vue({
     }
   }
 });
-
+initMastodon();
 
 function initMastodon() {
   // ToDo: Check Cookie
