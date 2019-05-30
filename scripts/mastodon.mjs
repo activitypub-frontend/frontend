@@ -1,5 +1,5 @@
-// import Vue from './vue.js';
-
+// Everything related to the mastodon-instance
+// Init Vue-Object for data binding
 const mastodonCardVue = new Vue({
   el: '#mastodonCard',
   data: {
@@ -10,12 +10,10 @@ const mastodonCardVue = new Vue({
 
   },
   methods: {
-    say: function(message) {
-      alert(message);
-    },
   },
 });
 
+// Register event listeners for auth-button and enter
 document.querySelector('#mastodonLoginClick').onclick = () => {
   const mInstance = document.getElementById('mastodonInstance').value;
   console.log('Auth with ' + mInstance);
@@ -30,12 +28,16 @@ document.querySelector('#mastodonInstance').addEventListener("keyup", function(e
   }
 });
 
+// Init variables for mastodon state, default to not authenticated
 let mAuth = false;
 let mToken;
 let mInstance;
+
+// Run initialization
 initMastodon();
 
 function initMastodon() {
+  // Check if querystring has the auth key (comes from backend)
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('mLogin')) {
     if (urlParams.get('mLogin') === '1' && urlParams.get('mCode')) {
@@ -51,12 +53,13 @@ function initMastodon() {
     `;
     }
   }
+  // Check if auth key and instance is available as cookie -> probably logged in
   if (getCookie('mInstance') && getCookie('mToken')) {
     mAuth = true;
     mToken = getCookie('mToken');
     mInstance = getCookie('mInstance');
   }
-  // Check Valid session
+  // Check Valid session by trying endpoint
   if (mAuth) {
     fetch('https://' + mInstance + '/api/v1/accounts/verify_credentials', {
       headers: {
@@ -65,8 +68,10 @@ function initMastodon() {
     }).then((d) => {
       console.log(d);
       if (d.ok) {
+        // Successfull: Display content
         mContent();
       } else {
+        // Error: Do nothing, start with defaults
         mAuth = false;
         console.log(d);
         mastodonCardVue.mastodoncontent = `
@@ -84,7 +89,9 @@ function initMastodon() {
 
 function mContent() {
   if (mAuth) {
+    // Remove the authentication/instance form
     document.getElementById('mLoginInstance').style.display = 'none';
+    // Get the timeline
     fetch('https://' + mInstance + '/api/v1/timelines/home', {
       headers: {
         'Authorization': 'Bearer ' + mToken,
@@ -92,9 +99,8 @@ function mContent() {
     }).then((d) => {
       return d.json();
     }).then((d) => {
-      console.log(d);
       for (let s in d) {
-        console.log(d[s]);
+        // Build HTML for each post
         mastodonCardVue.mastodoncontent += mRenderStatus(d[s]);
       }
     });
@@ -104,19 +110,23 @@ function mContent() {
 
 function mRenderStatus(s) {
   let htmlStatus = '<div class=\'mStatus\' id=\'' + s.id + '\'>';
-  // From
+  // Post header: author, image and date
   htmlStatus += '<p class=\'mStatusPrefix\'><span class=\'mAuthorImgBox\'><a href=\''+s.account.url+'\'\' target=\'_blank\' class=\'mAuthorImgLink\'><img src=\'' + s.account.avatar + '\' class=\'mAuthorImg\'></a></span>';
   htmlStatus += '<span class=\'mAuthor\'><a href=\''+s.account.url+'\'\' target=\'_blank\' class=\'mAuthorLink\'>' + s.account.display_name + '</a><br>';
   htmlStatus += '<a class=\'mAuthorUser mAuthorLink\' href=\''+s.account.url+'\'\' target=\'_blank\'>@' + s.account.username + '</a></span>';
   htmlStatus += '<span class=\'mCreated\'>' + formatDate(new Date(s.created_at)) + '</span></p>';
+  // Post content
   htmlStatus += '<p class=\'mContent\'>' + s.content + '</p>';
+  // Image
   if(s.media_attachments[0] && s.media_attachments[0].type === 'image') {
     htmlStatus += '<a href=\''+s.media_attachments[0].text_url+'\' target=\'_blank\'><img src=\''+s.media_attachments[0].preview_url+'\' class=\'mImg\'></a>';
   }
+  // Link
   htmlStatus += '<hr><a class=\'mLink\' target=\'_blank\' href=\''+s.url+'\'>View on Mastodon</a></div>';
   return htmlStatus;
 }
-
+// Helper methods
+// builds date for display
 function formatDate(date) {
   var day = '0'+date.getDate();
   var month = '0'+date.getMonth();
@@ -126,6 +136,7 @@ function formatDate(date) {
   return day.slice(-2) + '.' + month.slice(-2) + ' ' + hour.slice(-2) + ':' + minute.slice(-2);
 }
 
+// Does redirection to authentication page
 function doMastodonAuth(mInstance) {
   if (mInstance.length < 5) {
     mastodonCardVue.mastodoncontent = `
@@ -133,6 +144,7 @@ function doMastodonAuth(mInstance) {
     `;
     return;
   }
+  // get client_id from backend
   fetch('/mastodon/' + mInstance + '/oauth', {
     method: 'GET',
   }).then((res) => res.json()).then((json) => {
@@ -143,6 +155,7 @@ function doMastodonAuth(mInstance) {
       throw 'Server Side Problem';
     }
     setCookie('mInstance', mInstance, 30);
+    // redirect
     window.location.replace('https://' + mInstance + '/oauth/authorize?scope=read&response_type=code&redirect_uri=https://dashboard.tinf17.in&client_id=' + json.client_id);
   }).catch((e) => {
     mastodonCardVue.mastodoncontent = `
@@ -151,7 +164,7 @@ function doMastodonAuth(mInstance) {
 
   });
 }
-
+// Cookie helper functions
 function setCookie(cname, cvalue, exdays) {
   var d = new Date();
   d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
