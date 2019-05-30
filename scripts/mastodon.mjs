@@ -58,6 +58,8 @@ function mContent() {
         "Authorization": "Bearer " + mToken
       }
     }).then((d) => {
+      return d.json();
+    }).then((d) => {
       console.log(d);
     });
 
