@@ -66,6 +66,10 @@
     </card>
     <card id="mastodonCard" class="content-card">
       <header>{{ title }}</header>
+      <div>
+        <input type="text" id="mastodonInstance" placeholder="Your instance (e.g. mastodon.social)">
+        <button type="button" id="mastodonLoginClick" v-on:click="mastodonLogin">Authenticate</button>
+      </div>
       <div id="mastodonCard-content" class="card-content" v-html="mastodoncontent">
       </div>
     </card>

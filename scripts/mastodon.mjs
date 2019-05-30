@@ -30,10 +30,7 @@ function initMastodon() {
 
   // ToDo: Check if code is available
   mastodonCardVue.mastodoncontent = `
-<div>
-        <input type="text" id="mastodonInstance" placeholder="Your instance (e.g. mastodon.social)">
-        <button type="button" id="mastodonLoginClick" v-on:click="mastodonLogin">Authenticate</button>
-      </div>`;
+`;
 }
 
 function doMastodonAuth(mInstance) {
