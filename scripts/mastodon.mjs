@@ -7,7 +7,7 @@ const mastodonCardVue = new Vue({
     mastodoncontent: '',
   },
   created: function() {
-    console.log('Vue instance was created');
+    initMastodon();
   },
   methods: {
     mastodonLogin: function(event) {
