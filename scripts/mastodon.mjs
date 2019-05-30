@@ -84,6 +84,9 @@ function mContent() {
       return d.json();
     }).then((d) => {
       console.log(d);
+      for(let s in d) {
+        mastodonCardVue.mastodoncontent+=JSON.stringify(s);
+      }
     });
 
   }
