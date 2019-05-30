@@ -103,7 +103,7 @@ function mRenderStatus(s) {
   if(s.media_attachments[0] && s.media_attachments[0].type === "image") {
     htmlStatus += "<a href='"+s.media_attachments[0].text_url+"' target='_blank'><img src='"+s.media_attachments[0].preview_url+"' class='mImage'></a>";
   }
-  htmlStatus += "<a class='mLink' target='_blank' href='"+s.url"'>View on Mastodon</a></div>";
+  htmlStatus += "<hr><a class='mLink' target='_blank' href='"+s.url+"'>View on Mastodon</a></div>";
   return htmlStatus;
 }
 
