@@ -14,10 +14,10 @@
   float: right;
   font-size: 10pt;
 }
-.mAuthorLink {
+.mAuthorLink .mLink {
   color: grey;
 
 }
-.mAuthorLink:hover {
+.mAuthorLink:hover .mLink {
   text-decoration: none;
 }
