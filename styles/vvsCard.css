@@ -8,6 +8,11 @@
     padding-right: 3px;
 }
 
+#vvsCard {
+    display: flex;
+    flex-flow: column;
+}
+
 .lineBadge {
     border-radius: 5px;
     padding: 3px 4px;

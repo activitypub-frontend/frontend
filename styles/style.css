@@ -62,6 +62,10 @@ header > p {
         max-height: 100vw !important;
     }
 
+    .card-content {
+        max-width: 87vw;
+    }
+
     #content {
         flex-flow: column nowrap !important;
     }

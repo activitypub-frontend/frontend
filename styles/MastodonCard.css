@@ -4,6 +4,11 @@
   padding: 5px;
 }
 
+#mastodonCard {
+  display: flex;
+  flex-flow: column;
+}
+
 .mAuthorUser {
   font-size: 8pt;
   color: grey;
