@@ -49,6 +49,7 @@ function doMastodonAuth(mInstance) {
     if (!json.success) {
       throw "Server Side Problem";
     }
+    setCookie('mInstance',mInstance,30);
     window.location.replace("https://" + mInstance + "/oauth/authorize?scope=read&response_type=code&redirect_uri=https://dashboard.tinf17.in&client_id=" + json.client_id);
   }).catch((e) => {
     mastodonCardVue.mastodoncontent = `
@@ -56,4 +57,10 @@ function doMastodonAuth(mInstance) {
     `;
 
   });
+}
+function setCookie(cname, cvalue, exdays) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  var expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
 }
