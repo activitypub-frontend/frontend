@@ -53,9 +53,9 @@ function initMastodon() {
 
 function mContent() {
   if (mAuth) {
-    fetch('https://' + mInstance '/api/v1/timelines/home', {
+    fetch('https://' + mInstance + '/api/v1/timelines/home', {
       headers: {
-        "Authorization": "Bearer " + mToken;
+        "Authorization": "Bearer " + mToken
       }
     }).then((d) => {
       console.log(d);
