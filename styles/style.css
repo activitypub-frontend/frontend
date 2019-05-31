@@ -77,7 +77,7 @@ header > p {
     z-index: 0;
     display: flex;
     flex-flow: row wrap;
-    justify-content: left;
+    justify-content: center;
     overflow: auto;
     color: var(--content-text-color);
 }
