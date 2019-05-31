@@ -347,16 +347,19 @@ function getVVSData() {
   }).then((res) => res.json()).then((json) => {
     const div = document.createElement('div');
     json.departureList.forEach((el) => {
-      const realTime = new Date(el.realDateTime.year,
-          el.realDateTime.month - 1,
-          el.realDateTime.day,
-          el.realDateTime.hour,
-          el.realDateTime.minute);
       const expectedTime = new Date(el.dateTime.year,
           el.dateTime.month - 1,
           el.dateTime.day,
           el.dateTime.hour,
           el.dateTime.minute);
+      let realTime = expectedTime;
+      if (el.realDateTime) {
+        realTime = new Date(el.realDateTime.year,
+            el.realDateTime.month - 1,
+            el.realDateTime.day,
+            el.realDateTime.hour,
+            el.realDateTime.minute);
+      }
       const delay = realTime > expectedTime;
       const row = document.createElement('article');
       const lineBadge = document.createElement('span');
